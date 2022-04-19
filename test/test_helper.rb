@@ -4,6 +4,8 @@ $LOAD_PATH.unshift File.expand_path("../lib", __dir__)
 
 require "active_record"
 require "active_record/associated_object"
+require "kredis"
+require "active_job"
 require "logger"
 
 require "minitest/autorun"
@@ -20,10 +22,19 @@ ActiveRecord::Schema.define do
   end
 end
 
+# Shim what an app integration would look like.
+class ApplicationRecord; end
+class ApplicationRecord::AssociatedObject < ActiveRecord::AssociatedObject
+  include GlobalID::Integration, Kredis::Attributes
+end
+
 class Post < ActiveRecord::Base
   has_many :comments
 end
 
 class Comment < ActiveRecord::Base
   belongs_to :post
+end
+
+class Post::Publisher < ApplicationRecord::AssociatedObject
 end
