@@ -26,22 +26,21 @@ class ActiveRecord::AssociatedObject
       @associated_record_methods_module ||= Module.new.tap { |mod| record_klass.include mod }
     end
 
-    def first
-      record_klass.first.public_send(attribute_name)
+    def extract_one(*names)
+      names.each do |name|
+        define_singleton_method(name) { |*args, **options, &block| record_klass.send(name, *args, **options, &block)&.public_send(attribute_name) }
+      end
     end
 
-    def find(id)
-      record_klass.find(id).public_send(attribute_name)
-    end
-
-    def find_by(**attributes)
-      record_klass.find_by(**attributes)&.public_send(attribute_name)
-    end
-
-    def where(...)
-      record_klass.where(...).map(&attribute_name)
+    def extract_all(*names)
+      names.each do |name|
+        define_singleton_method(name) { |*args, **options, &block| record_klass.send(name, *args, **options, &block).map(&attribute_name) }
+      end
     end
   end
+
+  extract_one :first, :last, :find, :find_by
+  extract_all :where
 
   attr_reader :record
   delegate :id, to: :record
