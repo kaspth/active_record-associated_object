@@ -6,6 +6,7 @@ require "active_record"
 require "active_record/associated_object"
 require "kredis"
 require "active_job"
+require "global_id"
 require "logger"
 
 require "minitest/autorun"
@@ -23,16 +24,19 @@ ActiveRecord::Schema.define do
 end
 
 # Shim what an app integration would look like.
-class ApplicationRecord; end
-class ApplicationRecord::AssociatedObject < ActiveRecord::AssociatedObject
-  include GlobalID::Integration, Kredis::Attributes
+class ApplicationRecord < ActiveRecord::Base
+  self.abstract_class = true
 end
 
-class Post < ActiveRecord::Base
+class ApplicationRecord::AssociatedObject < ActiveRecord::AssociatedObject
+  include GlobalID::Identification, Kredis::Attributes
+end
+
+class Post < ApplicationRecord
   has_many :comments
 end
 
-class Comment < ActiveRecord::Base
+class Comment < ApplicationRecord
   belongs_to :post
 end
 

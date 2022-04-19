@@ -1,9 +1,10 @@
 class ActiveRecord::AssociatedObject
   class << self
-    def inherited(object_name)
-      record_klass   = object_name.module_parent
-      record_name    = object_name.module_parent_name.underscore.to_sym
-      attribute_name = object_name.demodulize.underscore.to_sym
+    def inherited(klass)
+      record_klass   = klass.module_parent
+      return if record_klass.respond_to?(:abstract_class?) && record_klass.abstract_class?
+      record_name    = klass.module_parent_name.underscore
+      attribute_name = klass.to_s.demodulize.underscore.to_sym
 
       unless record_klass.is_a?(ActiveRecord::Base)
         raise ArgumentError, "#{record_klass} isn't valid; can only associate with ActiveRecord::Base subclasses"
