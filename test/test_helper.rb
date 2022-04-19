@@ -15,11 +15,12 @@ ActiveRecord::Base.establish_connection(adapter: "sqlite3", database: ":memory:"
 ActiveRecord::Base.logger = Logger.new(STDOUT)
 
 ActiveRecord::Schema.define do
-  create_table :posts, force: true do |t|
+  create_table :authors, force: true do |t|
   end
 
-  create_table :comments, force: true do |t|
-    t.integer :post_id
+  create_table :posts, force: true do |t|
+    t.string :title
+    t.integer :author_id
   end
 end
 
@@ -32,13 +33,16 @@ class ApplicationRecord::AssociatedObject < ActiveRecord::AssociatedObject
   include GlobalID::Identification, Kredis::Attributes
 end
 
-class Post < ApplicationRecord
-  has_many :comments
+class Author < ApplicationRecord
+  has_many :posts
 end
 
-class Comment < ApplicationRecord
-  belongs_to :post
+class Post < ApplicationRecord
+  belongs_to :author
 end
+
+author = Author.create!
+author.posts.create! id: 1, title: "First post"
 
 class Post::Publisher < ApplicationRecord::AssociatedObject
 end
