@@ -1,12 +1,12 @@
-class active_record::AssociatedObject
+class ActiveRecord::AssociatedObject
   class << self
     def inherited(object_name)
       record_klass   = object_name.module_parent
       record_name    = object_name.module_parent_name.underscore.to_sym
       attribute_name = object_name.demodulize.underscore.to_sym
 
-      unless record_klass.is_a?(active_record::Base)
-        raise ArgumentError, "#{record_klass} isn't valid; can only associate with active_record::Base subclasses"
+      unless record_klass.is_a?(ActiveRecord::Base)
+        raise ArgumentError, "#{record_klass} isn't valid; can only associate with ActiveRecord::Base subclasses"
       end
 
       alias_method record_name, :record

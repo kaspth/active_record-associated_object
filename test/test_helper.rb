@@ -8,10 +8,10 @@ require "logger"
 
 require "minitest/autorun"
 
-active_record::Base.establish_connection(adapter: "sqlite3", database: ":memory:")
-active_record::Base.logger = Logger.new(STDOUT)
+ActiveRecord::Base.establish_connection(adapter: "sqlite3", database: ":memory:")
+ActiveRecord::Base.logger = Logger.new(STDOUT)
 
-active_record::Schema.define do
+ActiveRecord::Schema.define do
   create_table :posts, force: true do |t|
   end
 
@@ -20,10 +20,10 @@ active_record::Schema.define do
   end
 end
 
-class Post < active_record::Base
+class Post < ActiveRecord::Base
   has_many :comments
 end
 
-class Comment < active_record::Base
+class Comment < ActiveRecord::Base
   belongs_to :post
 end
