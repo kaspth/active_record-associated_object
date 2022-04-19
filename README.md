@@ -1,8 +1,27 @@
 # ActiveRecord::AssociatedObject
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/active_record/associated_object`. To experiment with that code, run `bin/console` for an interactive prompt.
+Associate a Ruby PORO with an Active Record class and have it quack like one. Build and extend your domain model relying on the Active Record association to make it unique.
 
-TODO: Delete this and the text above, and describe your gem
+```ruby
+class Post < ActiveRecord::Base
+end
+
+# Create a standard PORO, but derive attributes from the Post:: namespace and its primary key.
+class Post::Publisher < ActiveRecord::AssociatedObject
+  kredis_datetime :publish_at # Kredis integration generates a "post:publisher:<post_id>:publish_at" key.
+
+  def publish_later
+    PublishJob.set(wait: publish_at).perform_later self
+  end
+end
+
+class Post::Publisher::PublishJob < ActiveJob::Base
+  def perform(publisher)
+     # Automatic integration via GlobalID means you don't have to do `post.publisher`.
+    publisher.publish_now
+  end
+end
+```
 
 ## Installation
 

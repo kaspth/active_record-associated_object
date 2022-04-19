@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors = ["Kasper Timm Hansen"]
   spec.email   = ["hey@kaspth.com"]
 
-  spec.summary  = "Associate a PORO to an Active Record"
+  spec.summary  = "Associate a Ruby PORO with an Active Record"
   spec.homepage = "https://github.com/kaspth/active_record-associated_object"
   spec.license  = "MIT"
   spec.required_ruby_version = ">= 2.7.0"
