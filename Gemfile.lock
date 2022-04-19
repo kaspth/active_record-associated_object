@@ -2,14 +2,14 @@ PATH
   remote: .
   specs:
     active_record-associated_object (0.1.0)
-      active_record (>= 6.1)
+      activerecord (>= 6.1)
 
 GEM
   remote: https://rubygems.org/
   specs:
     activemodel (7.0.2.3)
       activesupport (= 7.0.2.3)
-    active_record (7.0.2.3)
+    activerecord (7.0.2.3)
       activemodel (= 7.0.2.3)
       activesupport (= 7.0.2.3)
     activesupport (7.0.2.3)
