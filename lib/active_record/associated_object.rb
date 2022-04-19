@@ -33,7 +33,7 @@ class ActiveRecord::AssociatedObject
     end
   end
 
-  struct :record
+  attr_reader :record
   delegate :id, to: :record
 
   def initialize(record)
