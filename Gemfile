@@ -2,7 +2,7 @@
 
 source "https://rubygems.org"
 
-# Specify your gem's dependencies in activerecord-associated_object.gemspec
+# Specify your gem's dependencies in active_record-associated_object.gemspec
 gemspec
 
 gem "sqlite3"

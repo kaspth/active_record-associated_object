@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
-require_relative "lib/activerecord/associated_object/version"
+require_relative "lib/active_record/associated_object/version"
 
 Gem::Specification.new do |spec|
-  spec.name    = "activerecord-associated_object"
-  spec.version = Activerecord::AssociatedObject::VERSION
+  spec.name    = "active_record-associated_object"
+  spec.version = ActiveRecord::AssociatedObject::VERSION
   spec.authors = ["Kasper Timm Hansen"]
   spec.email   = ["hey@kaspth.com"]
 
   spec.summary  = "Associate a PORO to an Active Record"
-  spec.homepage = "https://github.com/kaspth/activerecord-associated_object"
+  spec.homepage = "https://github.com/kaspth/active_record-associated_object"
   spec.license  = "MIT"
   spec.required_ruby_version = ">= 2.7.0"
 
@@ -29,7 +29,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   # Uncomment to register a new dependency of your gem
-  spec.add_dependency "activerecord", ">= 6.1"
+  spec.add_dependency "active_record", ">= 6.1"
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html

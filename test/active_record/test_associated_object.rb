@@ -2,9 +2,9 @@
 
 require "test_helper"
 
-class Activerecord::TestAssociatedObject < Minitest::Test
+class active_record::TestAssociatedObject < Minitest::Test
   def test_that_it_has_a_version_number
-    refute_nil ::Activerecord::AssociatedObject::VERSION
+    refute_nil ::active_record::AssociatedObject::VERSION
   end
 
   def test_it_does_something_useful
