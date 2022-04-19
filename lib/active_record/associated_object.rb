@@ -21,26 +21,19 @@ class ActiveRecord::AssociatedObject
       RUBY
     end
 
+    delegate :respond_to_missing?, to: :record_klass
+
+    def method_missing(method, ...)
+      record_klass.public_send(method, ...).then do |value|
+        value.respond_to?(:each) ? value.map(&attribute_name) : value&.public_send(attribute_name)
+      end
+    end
+
     # Just a module shim to define instance methods on the record while we're loading our associated class.
     def record
       @associated_record_methods_module ||= Module.new.tap { |mod| record_klass.include mod }
     end
-
-    def extract_one(*names)
-      names.each do |name|
-        define_singleton_method(name) { |*args, **options, &block| record_klass.send(name, *args, **options, &block)&.public_send(attribute_name) }
-      end
-    end
-
-    def extract_all(*names)
-      names.each do |name|
-        define_singleton_method(name) { |*args, **options, &block| record_klass.send(name, *args, **options, &block).map(&attribute_name) }
-      end
-    end
   end
-
-  extract_one :first, :last, :find, :find_by
-  extract_all :where
 
   attr_reader :record
   delegate :id, to: :record
