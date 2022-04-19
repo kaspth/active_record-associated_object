@@ -5,6 +5,7 @@ source "https://rubygems.org"
 # Specify your gem's dependencies in activerecord-associated_object.gemspec
 gemspec
 
-gem "rake", "~> 13.0"
+gem "sqlite3"
 
+gem "rake", "~> 13.0"
 gem "minitest", "~> 5.0"
