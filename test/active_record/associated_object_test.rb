@@ -22,4 +22,15 @@ class ActiveRecord::AssociatedObjectTest < Minitest::Test
     assert_equal @publisher,     Post::Publisher.find_by(author: Author.first)
     assert_equal [ @publisher ], Post::Publisher.where(id: 1)
   end
+
+  def test_record_extension_via_module_proxy
+    skip
+
+    Post::Publisher.class_eval do
+      def record.heyo = :heyo
+    end
+
+    assert_equal :heyo, @publisher.post.heyo
+    assert_equal :heyo, Post.first.heyo
+  end
 end
