@@ -24,5 +24,11 @@ jobs:
       with:
         ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
+
+    - name: Set up Redis 4
+      uses: supercharge/redis-github-action@1.2.0
+      with:
+        redis-version: 4
+
     - name: Run the default task
       run: bundle exec rake
