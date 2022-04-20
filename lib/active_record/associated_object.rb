@@ -31,15 +31,6 @@ class ActiveRecord::AssociatedObject
         end
       end
     end
-
-    # Just a module shim to define instance methods on the record while we're loading our associated class.
-    def record
-      @associated_record_methods_module ||= Class.new(record_klass) do
-        define_singleton_method :method_added do |meth|
-          superclass.define_method(meth, &method(meth))
-        end
-      end
-    end
   end
 
   attr_reader :record
