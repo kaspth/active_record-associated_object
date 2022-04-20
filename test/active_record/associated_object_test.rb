@@ -2,7 +2,7 @@
 
 require "test_helper"
 
-class ActiveRecord::AssociatedObjectTest < ActiveRecord::AssociatedObject::Test
+class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
   include ActiveJob::TestHelper # TODO: Switch back to Minitest::Test, but need to fix `tagged_logger` NoMethodError.
 
   def setup

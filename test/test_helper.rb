@@ -27,9 +27,6 @@ require_relative "boot/associated_object"
 author = Author.create!
 author.posts.create! id: 1, title: "First post"
 
-class ActiveRecord::AssociatedObject::Test < ActiveSupport::TestCase
-  def teardown
-    super
-    Kredis.clear_all
-  end
+class ActiveSupport::TestCase
+  teardown { Kredis.clear_all }
 end
