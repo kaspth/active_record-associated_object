@@ -21,12 +21,14 @@ class ActiveRecord::AssociatedObject
       RUBY
     end
 
-    def respond_to_missing?(...) = record_klass.respond_to?(...)
+    def respond_to_missing?(...) = record_klass.respond_to?(...) || super
     delegate :unscoped, to: :record_klass
 
     def method_missing(method, ...)
-      record_klass.public_send(method, ...).then do |value|
-        value.respond_to?(:each) ? value.map(&attribute_name) : value&.public_send(attribute_name)
+      if !record_klass.respond_to?(method) then super else
+        record_klass.public_send(method, ...).then do |value|
+          value.respond_to?(:each) ? value.map(&attribute_name) : value&.public_send(attribute_name)
+        end
       end
     end
 
