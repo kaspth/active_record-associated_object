@@ -16,13 +16,19 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
     assert_equal @publisher.post, @publisher.record
   end
 
-  def test_associated_object_integration
+  def test_associated_object_method_missing_extraction
     assert_equal @publisher,     Post::Publisher.first
     assert_equal @publisher,     Post::Publisher.find(1)
     assert_equal @publisher,     Post::Publisher.find_by(id: 1)
     assert_equal @publisher,     Post::Publisher.find_by(title: Post.first.title)
     assert_equal @publisher,     Post::Publisher.find_by(author: Author.first)
     assert_equal [ @publisher ], Post::Publisher.where(id: 1)
+  end
+
+  def test_unscoped_passthrough
+    # TODO: lol what's this actually supposed to do? Need to look more into GlobalID.
+    # https://github.com/rails/globalid/blob/3ddb0f87fd5c22b3330ab2b4e5c41a85953ac886/lib/global_id/locator.rb#L164
+    assert_equal [ @post ], @publisher.class.unscoped
   end
 
   def test_record_extension_via_module_proxy
