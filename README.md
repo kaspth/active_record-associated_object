@@ -8,10 +8,10 @@ end
 
 # Create a standard PORO, but derive attributes from the Post:: namespace and its primary key.
 class Post::Publisher < ActiveRecord::AssociatedObject
-  kredis_datetime :publish_at # Kredis integration generates a "post:publisher:<post_id>:publish_at" key.
+  kredis_datetime :publish_at # Kredis integration generates a "post:publishers:<post_id>:publish_at" key.
 
   def publish_later
-    PublishJob.set(wait: publish_at).perform_later self
+    PublishJob.set(wait_until: publish_at).perform_later self
   end
 end
 
