@@ -32,6 +32,11 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
     assert_equal [ @post ], @publisher.class.unscoped
   end
 
+  def test_transaction_passthrough
+    assert_equal @post, Post::Publisher.transaction { Post.first }
+    assert_equal @post, @publisher.transaction { Post.first }
+  end
+
   def test_kredis_integration
     Time.new(2022, 4, 20, 1).tap do |publish_at|
       @publisher.publish_at.value = publish_at
