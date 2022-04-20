@@ -7,6 +7,7 @@ require "active_record/associated_object"
 require "kredis"
 require "active_job"
 require "global_id"
+require "debug"
 require "logger"
 
 require "minitest/autorun"
