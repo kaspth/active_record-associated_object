@@ -3,17 +3,30 @@
 Associate a Ruby PORO with an Active Record class and have it quack like one. Build and extend your domain model relying on the Active Record association to make it unique.
 
 ```ruby
+# app/models/post.rb
 class Post < ActiveRecord::Base
 end
 
 # Create a standard PORO, but derive attributes from the Post:: namespace and its primary key.
+# app/models/post/publisher.rb
 class Post::Publisher < ActiveRecord::AssociatedObject
   kredis_datetime :publish_at # Kredis integration generates a "post:publishers:<post_id>:publish_at" key.
+
+  # Both a general `record` method and a `post` method is available to access the associated post.
+  def publish_now
+    transaction do
+      post.update! published: true
+      post.subscribers.post_published post
+    end
+  end
 
   def publish_later
     PublishJob.set(wait_until: publish_at).perform_later self
   end
 end
+
+# Post now has a publisher too.
+Post.first.publisher # => Post::Publisher.new(self) # Where self is Post.first.
 
 class Post::Publisher::PublishJob < ActiveJob::Base
   def perform(publisher)
@@ -32,10 +45,6 @@ Install the gem and add to the application's Gemfile by executing:
 If bundler is not being used to manage dependencies, install the gem by executing:
 
     $ gem install active_record-associated_object
-
-## Usage
-
-TODO: Write usage instructions here
 
 ## Development
 
