@@ -2,15 +2,20 @@
 
 $LOAD_PATH.unshift File.expand_path("../lib", __dir__)
 
-require "active_record"
-require "active_record/associated_object"
+require "rails/railtie"
 require "kredis"
 require "active_job"
 require "global_id"
 require "debug"
 require "logger"
 
+require "active_record"
+require "active_record/associated_object"
+
 require "minitest/autorun"
+
+# Simulate Rails app boot and run the railtie initializers manually.
+ActiveRecord::AssociatedObject::Railtie.run_initializers
 
 Kredis.configurator = Class.new { def config_for(name) { db: "1" } end }.new
 
@@ -33,7 +38,6 @@ class ApplicationRecord < ActiveRecord::Base
 end
 
 class ApplicationRecord::AssociatedObject < ActiveRecord::AssociatedObject
-  include GlobalID::Identification, Kredis::Attributes
 end
 
 class Author < ApplicationRecord

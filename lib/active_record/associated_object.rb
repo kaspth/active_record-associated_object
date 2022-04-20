@@ -51,3 +51,5 @@ class ActiveRecord::AssociatedObject
     other.is_a?(self.class) && id == other.id
   end
 end
+
+require_relative "associated_object/railtie" if defined?(Rails::Railtie)

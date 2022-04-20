@@ -14,3 +14,4 @@ gem "debug"
 # Integrations to setup and test with.
 gem "kredis"
 gem "activejob"
+gem "railties"
