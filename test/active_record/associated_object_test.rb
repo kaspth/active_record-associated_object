@@ -2,7 +2,9 @@
 
 require "test_helper"
 
-class ActiveRecord::AssociatedObjectTest < Minitest::Test
+class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
+  include ActiveJob::TestHelper
+
   def setup
     super
     @post = Post.first
@@ -32,5 +34,20 @@ class ActiveRecord::AssociatedObjectTest < Minitest::Test
 
     assert_equal :heyo, @publisher.post.heyo
     assert_equal :heyo, Post.first.heyo
+  end
+
+  def test_global_id_integration
+    assert_equal "gid://test/Post::Publisher/1", @publisher.to_gid.to_s
+    assert_equal @publisher, GlobalID.find(@publisher.to_gid.to_s)
+  end
+
+  def test_active_job_integration
+    @publisher.performed = false
+
+    assert_performed_with job: Post::Publisher::PublishJob, args: [ @publisher ] do
+      @publisher.publish_later
+    end
+
+    assert @publisher.performed
   end
 end

@@ -44,5 +44,18 @@ end
 author = Author.create!
 author.posts.create! id: 1, title: "First post"
 
+GlobalID.app = "test"
+
 class Post::Publisher < ApplicationRecord::AssociatedObject
+  mattr_accessor :performed, default: false
+
+  def publish_later
+    PublishJob.perform_later self
+  end
+
+  class PublishJob < ActiveJob::Base
+    def perform(publisher)
+      publisher.performed = true
+    end
+  end
 end

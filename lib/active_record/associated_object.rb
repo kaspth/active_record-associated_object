@@ -21,7 +21,8 @@ class ActiveRecord::AssociatedObject
       RUBY
     end
 
-    delegate :respond_to_missing?, to: :record_klass
+    def respond_to_missing?(...) = record_klass.respond_to?(...)
+    delegate :unscoped, to: :record_klass
 
     def method_missing(method, ...)
       record_klass.public_send(method, ...).then do |value|
