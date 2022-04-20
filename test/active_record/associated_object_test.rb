@@ -18,6 +18,7 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
 
   def test_associated_object_method_missing_extraction
     assert_equal @publisher,     Post::Publisher.first
+    assert_equal @publisher,     Post::Publisher.last
     assert_equal @publisher,     Post::Publisher.find(1)
     assert_equal @publisher,     Post::Publisher.find_by(id: 1)
     assert_equal @publisher,     Post::Publisher.find_by(title: Post.first.title)
