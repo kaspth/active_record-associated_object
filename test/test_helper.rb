@@ -19,6 +19,8 @@ ActiveRecord::AssociatedObject::Railtie.run_initializers
 
 Kredis.configurator = Class.new { def config_for(name) { db: "1" } end }.new
 
+GlobalID.app = "test"
+
 ActiveRecord::Base.establish_connection(adapter: "sqlite3", database: ":memory:")
 ActiveRecord::Base.logger = Logger.new(STDOUT)
 
@@ -50,8 +52,6 @@ end
 
 author = Author.create!
 author.posts.create! id: 1, title: "First post"
-
-GlobalID.app = "test"
 
 class Post::Publisher < ApplicationRecord::AssociatedObject
   mattr_accessor :performed, default: false
