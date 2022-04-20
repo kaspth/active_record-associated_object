@@ -14,15 +14,15 @@ require "active_record/associated_object"
 
 require "minitest/autorun"
 
+require_relative "boot/active_record"
+require_relative "boot/associated_object"
+
 # Simulate Rails app boot and run the railtie initializers manually.
 ActiveRecord::AssociatedObject::Railtie.run_initializers
 
 Kredis.configurator = Class.new { def config_for(name) { db: "1" } end }.new
 
 GlobalID.app = "test"
-
-require_relative "boot/active_record"
-require_relative "boot/associated_object"
 
 author = Author.create!
 author.posts.create! id: 1, title: "First post"
