@@ -2,7 +2,7 @@
 
 require "test_helper"
 
-class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
+class ActiveRecord::AssociatedObjectTest < ActiveRecord::AssociatedObject::Test
   include ActiveJob::TestHelper # TODO: Switch back to Minitest::Test, but need to fix `tagged_logger` NoMethodError.
 
   def setup
@@ -41,6 +41,15 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
 
     assert_equal :heyo, @publisher.post.heyo
     assert_equal :heyo, Post.first.heyo
+  end
+
+  def test_kredis_integration
+    Time.new(2022, 4, 20, 1).tap do |publish_at|
+      @publisher.publish_at.value = publish_at
+
+      assert_equal "post:publishers:1:publish_at", @publisher.publish_at.key
+      assert_equal publish_at, @publisher.publish_at.value
+    end
   end
 
   def test_global_id_integration

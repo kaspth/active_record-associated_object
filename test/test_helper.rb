@@ -12,6 +12,8 @@ require "logger"
 
 require "minitest/autorun"
 
+Kredis.configurator = Class.new { def config_for(name) { db: "1" } end }.new
+
 ActiveRecord::Base.establish_connection(adapter: "sqlite3", database: ":memory:")
 ActiveRecord::Base.logger = Logger.new(STDOUT)
 
@@ -50,6 +52,8 @@ GlobalID.app = "test"
 class Post::Publisher < ApplicationRecord::AssociatedObject
   mattr_accessor :performed, default: false
 
+  kredis_datetime :publish_at
+
   def publish_later
     PublishJob.perform_later self
   end
@@ -58,5 +62,12 @@ class Post::Publisher < ApplicationRecord::AssociatedObject
     def perform(publisher)
       publisher.performed = true
     end
+  end
+end
+
+class ActiveRecord::AssociatedObject::Test < ActiveSupport::TestCase
+  def teardown
+    super
+    Kredis.clear_all
   end
 end
