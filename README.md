@@ -2,6 +2,8 @@
 
 Associate a Ruby PORO with an Active Record class and have it quack like one. Build and extend your domain model relying on the Active Record association to make it unique.
 
+## Usage
+
 ```ruby
 # app/models/post.rb
 class Post < ActiveRecord::Base

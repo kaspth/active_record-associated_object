@@ -32,17 +32,6 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
     assert_equal [ @post ], @publisher.class.unscoped
   end
 
-  def test_record_extension_via_module_proxy
-    skip
-
-    Post::Publisher.class_eval do
-      def record.heyo = :heyo
-    end
-
-    assert_equal :heyo, @publisher.post.heyo
-    assert_equal :heyo, Post.first.heyo
-  end
-
   def test_kredis_integration
     Time.new(2022, 4, 20, 1).tap do |publish_at|
       @publisher.publish_at.value = publish_at
