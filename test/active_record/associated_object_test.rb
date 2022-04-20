@@ -55,6 +55,10 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
   def test_global_id_integration
     assert_equal "gid://test/Post::Publisher/1", @publisher.to_gid.to_s
     assert_equal @publisher, GlobalID.find(@publisher.to_gid.to_s)
+
+    assert_raises(ActiveRecord::RecordNotFound) { GlobalID::Locator.locate_many([ Post.new(id: 2).publisher.to_gid.to_s ]) }
+    assert_equal [ @publisher ], GlobalID::Locator.locate_many([ @publisher.to_gid.to_s ])
+    assert_equal [ @publisher ], GlobalID::Locator.locate_many([ @publisher.to_gid.to_s, Post.new(id: 2).publisher.to_gid.to_s ], ignore_missing: true)
   end
 
   def test_active_job_integration
