@@ -22,4 +22,6 @@ end
 
 class Post < ApplicationRecord
   belongs_to :author
+
+  has_object :publisher
 end

@@ -13,12 +13,6 @@ class ActiveRecord::AssociatedObject
       define_singleton_method(:record_klass)   { record_klass }
       define_singleton_method(:attribute_name) { attribute_name }
       delegate :record_klass, :attribute_name, to: :class
-
-      record_klass.class_eval <<~RUBY, __FILE__, __LINE__ + 1
-        def #{attribute_name}
-          @#{attribute_name} ||= #{klass}.new(self)
-        end
-      RUBY
     end
 
     def respond_to_missing?(...) = record_klass.respond_to?(...) || super
