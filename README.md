@@ -7,6 +7,8 @@ Associate a Ruby PORO with an Active Record class and have it quack like one. Bu
 ```ruby
 # app/models/post.rb
 class Post < ActiveRecord::Base
+  # `has_object` defines a `publisher` method that calls Post::Publisher.new(post).
+  has_object :publisher, after_touch: true, before_destroy: :prevent_post_destroy
 end
 
 # Create a standard PORO, but derive attributes from the Post:: namespace and its primary key.
@@ -27,13 +29,36 @@ class Post::Publisher < ActiveRecord::AssociatedObject
   end
 end
 
-# Post now has a publisher too.
-Post.first.publisher # => Post::Publisher.new(self) # Where self is Post.first.
-
 class Post::Publisher::PublishJob < ActiveJob::Base
   def perform(publisher)
      # Automatic integration via GlobalID means you don't have to do `post.publisher`.
     publisher.publish_now
+  end
+end
+```
+
+### Passing callbacks onto the associated object
+
+`has_object` accepts a hash of callbacks to pass.
+
+```ruby
+class Post < ActiveRecord::Base
+  # Callbacks can be passed too to a specific method.
+  has_object :publisher, after_touch: true, before_destroy: :prevent_post_destroy
+
+  # The above is the same as writing:
+  after_touch { publisher.after_touch }
+  before_destroy { publisher.prevent_errant_post_destroy }
+end
+
+class Post::Publisher < ActiveRecord::AssociatedObject
+  def after_touch
+    # Respond to the after_touch on the Post.
+  end
+
+  def prevent_errant_post_destroy
+    # Passed callbacks can throw :abort too, and in this example prevent post.destroy.
+    throw :abort unless haha_business?
   end
 end
 ```
