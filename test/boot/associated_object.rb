@@ -10,7 +10,7 @@ class Post::Publisher < ApplicationRecord::AssociatedObject
     self.captured_title = post.title
   end
 
-  def prevent_post_destroy
+  def prevent_errant_post_destroy
     throw :abort
   end
 
