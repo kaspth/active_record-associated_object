@@ -23,5 +23,5 @@ end
 class Post < ApplicationRecord
   belongs_to :author
 
-  has_object :publisher
+  has_object :publisher, after_update_commit: true, before_destroy: :prevent_post_destroy
 end

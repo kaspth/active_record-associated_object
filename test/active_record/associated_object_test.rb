@@ -37,6 +37,15 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
     assert_equal @post, @publisher.transaction { Post.first }
   end
 
+  def test_callback_passing
+    @post.update title: "Updated title"
+    assert_equal "Updated title", @publisher.captured_title
+
+    @post.destroy
+    refute_predicate @post.destroyed?
+    refute_empty Post.all
+  end
+
   def test_kredis_integration
     Time.new(2022, 4, 20, 1).tap do |publish_at|
       @publisher.publish_at.value = publish_at
