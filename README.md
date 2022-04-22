@@ -63,6 +63,12 @@ class Post::Publisher < ActiveRecord::AssociatedObject
 end
 ```
 
+## Risks of depending on this gem
+
+This gem is relatively tiny and I'm not expecting more significant changes on it, for right now. It's unofficial and not affiliated with Rails core.
+
+Though it's written and maintained by an ex-Rails core person, so I know my way in and out of Rails and how to safely extend it.
+
 ## Installation
 
 Install the gem and add to the application's Gemfile by executing:
