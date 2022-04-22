@@ -42,7 +42,7 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
     assert_equal "Updated title", @publisher.captured_title
 
     @post.destroy
-    refute_predicate @post.destroyed?
+    refute_predicate @post, :destroyed?
     refute_empty Post.all
   end
 
