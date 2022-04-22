@@ -25,7 +25,7 @@ class Post::Publisher < ActiveRecord::AssociatedObject
   end
 
   def publish_later
-    PublishJob.set(wait_until: publish_at).perform_later self
+    PublishJob.set(wait_until: publish_at.value).perform_later self
   end
 end
 
