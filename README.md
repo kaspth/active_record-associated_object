@@ -58,7 +58,7 @@ class Post::Publisher < ActiveRecord::AssociatedObject
 
   def prevent_errant_post_destroy
     # Passed callbacks can throw :abort too, and in this example prevent post.destroy.
-    throw :abort unless haha_business?
+    throw :abort if haha_business?
   end
 end
 ```
