@@ -44,7 +44,7 @@ end
 ```ruby
 class Post < ActiveRecord::Base
   # Callbacks can be passed too to a specific method.
-  has_object :publisher, after_touch: true, before_destroy: :prevent_post_destroy
+  has_object :publisher, after_touch: true, before_destroy: :prevent_errant_post_destroy
 
   # The above is the same as writing:
   after_touch { publisher.after_touch }
