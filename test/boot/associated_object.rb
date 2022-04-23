@@ -1,3 +1,11 @@
+class Post::Mailroom < Struct.new(:record)
+  mattr_accessor :touched, default: false
+
+  def after_touch
+    self.touched = true
+  end
+end
+
 class ApplicationRecord::AssociatedObject < ActiveRecord::AssociatedObject; end
 
 class Post::Publisher < ApplicationRecord::AssociatedObject

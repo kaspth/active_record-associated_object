@@ -23,5 +23,6 @@ end
 class Post < ApplicationRecord
   belongs_to :author
 
+  has_object :mailroom,  after_touch: true
   has_object :publisher, after_update_commit: true, before_destroy: :prevent_errant_post_destroy
 end
