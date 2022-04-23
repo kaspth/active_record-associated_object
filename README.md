@@ -8,17 +8,30 @@ Associate a Ruby PORO with an Active Record class and have it quack like one. Bu
 # app/models/post.rb
 class Post < ActiveRecord::Base
   # `has_object` defines a `publisher` method that calls Post::Publisher.new(post).
-  has_object :publisher, after_touch: true, before_destroy: :prevent_post_destroy
+  has_object :publisher
 end
 
-# Create a standard PORO, but derive attributes from the Post:: namespace and its primary key.
+# app/models/post/publisher.rb
+class Post::Publisher
+  def initialize(post)
+    @post = post
+  end
+end
+```
+
+If you want Active Job, GlobalID and Kredis integration you can also have `Post::Publisher` inherit from `ActiveRecord::AssociatedObject`. This extends the standard PORO with details from the `Post::` namespace and the post primary key.
+
+```ruby
 # app/models/post/publisher.rb
 class Post::Publisher < ActiveRecord::AssociatedObject
+  # ActiveRecord::AssociatedObject defines initialize(post) automatically. It's derived from the `Post::` namespace.
+
   kredis_datetime :publish_at # Kredis integration generates a "post:publishers:<post_id>:publish_at" key.
 
-  # Both a general `record` method and a `post` method is available to access the associated post.
   def publish_now
+    # `transaction` is syntactic sugar for `post.transaction` here.
     transaction do
+      # A `post` method is generated to access the associated post. There's also a `record` alias available.
       post.update! published: true
       post.subscribers.post_published post
     end
