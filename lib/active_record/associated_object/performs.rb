@@ -5,7 +5,7 @@ module ActiveRecord::AssociatedObject::Performs
 
     class_eval <<~RUBY, __FILE__, __LINE__ + 1 if method
       def #{method}_later(*arguments, **options)
-        #{job}.perform_later self, *arguments, **options
+        #{job}.perform_later(self, *arguments, **options)
       end
     RUBY
   end
