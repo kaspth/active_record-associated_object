@@ -1,9 +1,11 @@
 module ActiveRecord::AssociatedObject::Performs
   def performs(method = nil, **configs, &block)
+    @job ||= safe_define("Job") { ApplicationJob }
+
     if method.nil?
-      apply_performs_to(job, **configs, &block)
+      apply_performs_to(@job, **configs, &block)
     else
-      job = safe_define("#{method}_job".classify) { self.job }
+      job = safe_define("#{method}_job".classify) { @job }
       apply_performs_to(job, **configs, &block)
 
       job.class_eval <<~RUBY, __FILE__, __LINE__ + 1 unless job.instance_method(:perform).owner == job
@@ -18,10 +20,6 @@ module ActiveRecord::AssociatedObject::Performs
         end
       RUBY
     end
-  end
-
-  def job
-    @job ||= safe_define("Job") { ApplicationJob }
   end
 
   private
