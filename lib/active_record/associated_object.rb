@@ -1,9 +1,5 @@
 class ActiveRecord::AssociatedObject
-  autoload :Performs, "active_record/associated_object/performs"
-
   class << self
-    include Performs
-
     def inherited(klass)
       record_klass   = klass.module_parent
       record_name    = klass.module_parent_name.underscore
