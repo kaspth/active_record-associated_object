@@ -1,12 +1,4 @@
 module ActiveRecord::AssociatedObject::Performs
-  begin
-    ActiveRecord::AssociatedObject::Job # Attempt a load to see if the app has defined an override.
-  rescue NameError
-    # TODO: Replace ActiveJob::Base with ApplicationJob
-    class ActiveRecord::AssociatedObject::Job < ActiveJob::Base
-    end
-  end
-
   def performs(method = nil, **configs, &block)
     job = method ? find_or_define_method_job(method) : job
     apply_performs_to(job, **configs, &block)
@@ -19,7 +11,7 @@ module ActiveRecord::AssociatedObject::Performs
   end
 
   def job
-    @job ||= "Job".safe_constantize || const_set("Job", Class.new(ActiveRecord::AssociatedObject::Job))
+    @job ||= "Job".safe_constantize || const_set("Job", Class.new(ApplicationJob))
   end
 
   private

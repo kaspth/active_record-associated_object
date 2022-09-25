@@ -21,6 +21,9 @@ Kredis.configurator = Class.new { def config_for(name) { db: "1" } end }.new
 
 GlobalID.app = "test"
 
+class ApplicationJob < ActiveJob::Base
+end
+
 require_relative "boot/active_record"
 require_relative "boot/associated_object"
 
