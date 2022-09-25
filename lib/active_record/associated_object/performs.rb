@@ -3,8 +3,14 @@ module ActiveRecord::AssociatedObject::Performs
     if method.nil?
       apply_performs_to(job, **configs, &block)
     else
-      job = safe_define_method_job(method)
+      job = safe_define("#{method}_job".classify) { self.job }
       apply_performs_to(job, **configs, &block)
+
+      job.class_eval <<~RUBY, __FILE__, __LINE__ + 1 unless job.instance_method(:perform).owner == job
+        def perform(object, *arguments, **options)
+          object.#{method}(*arguments, **options)
+        end
+      RUBY
 
       class_eval <<~RUBY, __FILE__, __LINE__ + 1
         def #{method}_later(*arguments, **options)
@@ -19,16 +25,6 @@ module ActiveRecord::AssociatedObject::Performs
   end
 
   private
-    def safe_define_method_job(method)
-      safe_define("#{method}_job".classify) { job }.tap do |job|
-        job.class_eval <<~RUBY, __FILE__, __LINE__ + 1 unless job.instance_method(:perform).owner == job
-          def perform(object, *arguments, **options)
-            object.#{method}(*arguments, **options)
-          end
-        RUBY
-      end
-    end
-
     def safe_define(name)
       name.safe_constantize || const_set(name, Class.new(yield))
     end
