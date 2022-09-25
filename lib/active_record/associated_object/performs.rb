@@ -10,19 +10,15 @@ module ActiveRecord::AssociatedObject::Performs
     end
   end
 
-  def performs(*methods, **configs, &block)
-    if methods.empty?
-      apply_performs_to(job, **configs, &block)
-    else
-      jobs_by_method = methods.index_with { find_or_define_method_job(_1, **configs, &block) }
-      extend_source_from(jobs_by_method) do |method, job|
-        <<~RUBY
-          def #{method}_later(*arguments, **options)
-            #{job}.perform_later self, :#{method}, *arguments, **options
-          end
-        RUBY
+  def performs(method = nil, **configs, &block)
+    job = method ? find_or_define_method_job(method) : job
+    apply_performs_to(job, **configs, &block)
+
+    class_eval <<~RUBY, __FILE__, __LINE__ + 1 if method
+      def #{method}_later(*arguments, **options)
+        #{job}.perform_later self, :#{method}, *arguments, **options
       end
-    end
+    RUBY
   end
 
   def job
@@ -30,9 +26,9 @@ module ActiveRecord::AssociatedObject::Performs
   end
 
   private
-    def find_or_define_method_job(method, ...)
+    def find_or_define_method_job(method)
       name = "#{method}_job".classify
-      name.safe_constantize || const_set(name, Class.new(job)).tap { apply_performs_to(_1, ...) }
+      name.safe_constantize || const_set(name, Class.new(job))
     end
 
     def apply_performs_to(job_class, **configs, &block)
