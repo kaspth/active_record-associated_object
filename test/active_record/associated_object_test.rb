@@ -75,7 +75,7 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
   def test_active_job_integration
     @publisher.performed = false
 
-    assert_performed_with job: Post::Publisher::PublishJob, args: [ @publisher ] do
+    assert_performed_with job: Post::Publisher::PublishJob, args: [ @publisher ], queue: "important" do
       @publisher.publish_later
     end
 

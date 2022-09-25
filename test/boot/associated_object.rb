@@ -14,7 +14,7 @@ class Post::Publisher < ApplicationRecord::AssociatedObject
 
   kredis_datetime :publish_at
 
-  performs :publish
+  performs :publish, queue_as: :important, discard_on: ActiveJob::DeserializationError
 
   def after_update_commit
     self.captured_title = post.title
