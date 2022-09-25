@@ -11,19 +11,22 @@ module ActiveRecord::AssociatedObject::Performs
   end
 
   def job
-    @job ||= "Job".safe_constantize || const_set("Job", Class.new(ApplicationJob))
+    @job ||= safe_define("Job") { ApplicationJob }
   end
 
   private
     def find_or_define_method_job(method)
-      name = "#{method}_job".classify
-      (name.safe_constantize || const_set(name, Class.new(job))).tap do |job|
+      safe_define("#{method}_job".classify) { job }.tap do |job|
         job.class_eval <<~RUBY, __FILE__, __LINE__ + 1 unless job.instance_method(:perform).owner == job
           def perform(object, *arguments, **options)
             object.#{method}(*arguments, **options)
           end
         RUBY
       end
+    end
+
+    def safe_define(name)
+      name.safe_constantize || const_set(name, Class.new(yield))
     end
 
     def apply_performs_to(job_class, **configs, &block)
