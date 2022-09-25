@@ -26,6 +26,14 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
     assert_equal [ @publisher ], Post::Publisher.where(id: 1)
   end
 
+  def test_introspection
+    assert_equal Post, @publisher.record_klass
+    assert_equal Post, Post::Publisher.record_klass
+
+    assert_equal :publisher, @publisher.attribute_name
+    assert_equal :publisher, Post::Publisher.attribute_name
+  end
+
   def test_unscoped_passthrough
     # TODO: lol what's this actually supposed to do? Need to look more into GlobalID.
     # https://github.com/rails/globalid/blob/3ddb0f87fd5c22b3330ab2b4e5c41a85953ac886/lib/global_id/locator.rb#L164
