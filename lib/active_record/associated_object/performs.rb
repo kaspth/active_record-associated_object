@@ -14,9 +14,7 @@ module ActiveRecord::AssociatedObject::Performs
     if methods.empty?
       apply_performs_to(job, **configs, &block)
     else
-      jobs_by_method = methods.index_with { find_or_define_job(detail: _1, superclass: job) }
-      jobs_by_method.each_value { |job| apply_performs_to(job, **configs, &block) }
-
+      jobs_by_method = methods.index_with { find_or_define_method_job(_1, **configs, &block) }
       extend_source_from(jobs_by_method) do |method, job|
         <<~RUBY
           def #{method}_later(*arguments, **options)
@@ -28,13 +26,13 @@ module ActiveRecord::AssociatedObject::Performs
   end
 
   def job
-    @job ||= find_or_define_job(superclass: ActiveRecord::AssociatedObject::Job)
+    @job ||= "Job".safe_constantize || const_set("Job", Class.new(ActiveRecord::AssociatedObject::Job))
   end
 
   private
-    def find_or_define_job(detail: nil, superclass:)
-      name = "#{detail&.to_s&.classify}Job"
-      name.safe_constantize || const_set(name, Class.new(superclass))
+    def find_or_define_method_job(method, ...)
+      name = "#{method}_job".classify
+      name.safe_constantize || const_set(name, Class.new(job)).tap { apply_performs_to(_1, ...) }
     end
 
     def apply_performs_to(job_class, **configs, &block)
