@@ -28,7 +28,12 @@ class Post::Publisher < ActiveRecord::AssociatedObject
 
   kredis_datetime :publish_at # Kredis integration generates a "post:publishers:<post_id>:publish_at" key.
 
-  def publish_now
+  # `performs` builds a `Post::Publisher::PublishJob` and routes configs over to it.
+  performs :publish, queue_as: :important, discard_on: SomeError do
+    retry_on TimeoutError, wait: :exponentially_longer
+  end
+
+  def publish
     # `transaction` is syntactic sugar for `post.transaction` here.
     transaction do
       # A `post` method is generated to access the associated post. There's also a `record` alias available.
@@ -36,16 +41,56 @@ class Post::Publisher < ActiveRecord::AssociatedObject
       post.subscribers.post_published post
     end
   end
+end
+```
 
-  def publish_later
-    PublishJob.set(wait_until: publish_at.value).perform_later self
+### How `performs` removes Active Job boilerplate
+
+With an associated object like this:
+
+```ruby
+class Post::Publisher < ActiveRecord::AssociatedObject
+  performs queue_as: :important
+  performs :publish
+  performs :retract
+
+  def publish
+  end
+
+  def retract(reason:)
   end
 end
+```
 
-class Post::Publisher::PublishJob < ActiveJob::Base
-  def perform(publisher)
-     # Automatic integration via GlobalID means you don't have to do `post.publisher`.
-    publisher.publish_now
+is equivalent to:
+
+```ruby
+class Post::Publisher < ActiveRecord::AssociatedObject
+  # `performs` without a method defines a general job to share between method jobs.
+  class Job < ApplicationJob
+    queue_as :important
+  end
+
+  # Individual method jobs inherit from the `Post::Publisher::Job` defined above.
+  class PublishJob < Job
+    def perform(publisher, *arguments, **options)
+      # GlobalID integration means associated objects can be passed into jobs like Active Records, i.e. we don't have to do `post.publisher`.
+      publisher.publish(*arguments, **options)
+    end
+  end
+
+  class RetractJob < Job
+    def perform(publisher, *arguments, **options)
+      publisher.retract(*arguments, **options)
+    end
+  end
+
+  def publish_later(*arguments, **options)
+    PublishJob.perform_later(self, *arguments, **options)
+  end
+
+  def retract_later(*arguments, **options)
+    RetractJob.perform_later(self, *arguments, **options)
   end
 end
 ```

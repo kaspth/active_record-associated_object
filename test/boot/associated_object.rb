@@ -14,6 +14,9 @@ class Post::Publisher < ApplicationRecord::AssociatedObject
 
   kredis_datetime :publish_at
 
+  performs queue_as: :not_really_important
+  performs :publish, queue_as: :important, discard_on: ActiveJob::DeserializationError
+
   def after_update_commit
     self.captured_title = post.title
   end
@@ -22,13 +25,7 @@ class Post::Publisher < ApplicationRecord::AssociatedObject
     throw :abort
   end
 
-  def publish_later
-    PublishJob.perform_later self
-  end
-
-  class PublishJob < ActiveJob::Base
-    def perform(publisher)
-      publisher.performed = true
-    end
+  def publish
+    self.performed = true
   end
 end
