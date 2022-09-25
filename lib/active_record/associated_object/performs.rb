@@ -1,6 +1,6 @@
 module ActiveRecord::AssociatedObject::Performs
   def performs(method = nil, **configs, &block)
-    job = method ? find_or_define_method_job(method) : job
+    job = method ? safe_define_method_job(method) : job
     apply_performs_to(job, **configs, &block)
 
     class_eval <<~RUBY, __FILE__, __LINE__ + 1 if method
@@ -15,7 +15,7 @@ module ActiveRecord::AssociatedObject::Performs
   end
 
   private
-    def find_or_define_method_job(method)
+    def safe_define_method_job(method)
       safe_define("#{method}_job".classify) { job }.tap do |job|
         job.class_eval <<~RUBY, __FILE__, __LINE__ + 1 unless job.instance_method(:perform).owner == job
           def perform(object, *arguments, **options)
