@@ -4,9 +4,6 @@ module ActiveRecord::AssociatedObject::Performs
   rescue NameError
     # TODO: Replace ActiveJob::Base with ApplicationJob
     class ActiveRecord::AssociatedObject::Job < ActiveJob::Base
-      def perform(object, method, *arguments, **options)
-        object.send(method, *arguments, **options)
-      end
     end
   end
 
@@ -16,7 +13,7 @@ module ActiveRecord::AssociatedObject::Performs
 
     class_eval <<~RUBY, __FILE__, __LINE__ + 1 if method
       def #{method}_later(*arguments, **options)
-        #{job}.perform_later self, :#{method}, *arguments, **options
+        #{job}.perform_later self, *arguments, **options
       end
     RUBY
   end
@@ -28,7 +25,13 @@ module ActiveRecord::AssociatedObject::Performs
   private
     def find_or_define_method_job(method)
       name = "#{method}_job".classify
-      name.safe_constantize || const_set(name, Class.new(job))
+      (name.safe_constantize || const_set(name, Class.new(job))).tap do |job|
+        job.class_eval <<~RUBY, __FILE__, __LINE__ + 1 unless job.instance_method(:perform).owner == job
+          def perform(object, *arguments, **options)
+            object.#{method}(*arguments, **options)
+          end
+        RUBY
+      end
     end
 
     def apply_performs_to(job_class, **configs, &block)
