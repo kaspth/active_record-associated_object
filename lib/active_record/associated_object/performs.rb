@@ -33,7 +33,7 @@ module ActiveRecord::AssociatedObject::Performs
 
   private
     def find_or_define_job(detail: nil, superclass:)
-      name = "#{record_klass}::#{attribute_name.classify}::#{detail&.classify}Job"
+      name = "#{record_klass}::#{attribute_name.to_s.classify}::#{detail&.to_s&.classify}Job"
       name.safe_constantize || const_set(name, Class.new(superclass))
     end
 
