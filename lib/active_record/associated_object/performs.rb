@@ -1,13 +1,17 @@
 module ActiveRecord::AssociatedObject::Performs
   def performs(method = nil, **configs, &block)
-    job = method ? safe_define_method_job(method) : job
-    apply_performs_to(job, **configs, &block)
+    if method.nil?
+      apply_performs_to(job, **configs, &block)
+    else
+      job = safe_define_method_job(method)
+      apply_performs_to(job, **configs, &block)
 
-    class_eval <<~RUBY, __FILE__, __LINE__ + 1 if method
-      def #{method}_later(*arguments, **options)
-        #{job}.perform_later(self, *arguments, **options)
-      end
-    RUBY
+      class_eval <<~RUBY, __FILE__, __LINE__ + 1
+        def #{method}_later(*arguments, **options)
+          #{job}.perform_later(self, *arguments, **options)
+        end
+      RUBY
+    end
   end
 
   def job
