@@ -4,8 +4,8 @@ class ActiveRecord::AssociatedObject::Railtie < Rails::Railtie
     ActiveRecord::AssociatedObject.include GlobalID::Identification if defined?(GlobalID)
 
     ActiveSupport.on_load :active_job do
-      require "active_record/associated_object/performs"
-      ActiveRecord::AssociatedObject.extend ActiveRecord::AssociatedObject::Performs
+      require "active_job/performs"
+      ActiveRecord::AssociatedObject.extend ActiveJob::Performs
     end
   end
 

@@ -1,3 +1,7 @@
+## [0.4.0] - 2022-09-25
+
+- Extract `performs` into the `active_job-performs` gem with some fixes and extra features, but include it as a dependency.
+
 ## [0.3.0] - 2022-09-25
 
 - Add `performs` to help cut down Active Job boilerplate.

@@ -46,6 +46,8 @@ end
 
 ### How `performs` removes Active Job boilerplate
 
+`performs` comes from the `active_job-performs` gem and is automatically bundled with `ActiveRecord::AssociatedObject`.
+
 With an associated object like this:
 
 ```ruby
