@@ -58,10 +58,13 @@ GEM
       nokogiri (>= 1.5.9)
     method_source (1.0.0)
     minitest (5.15.0)
+    minitest-sprint (1.2.2)
+      path_expander (~> 1.1)
     nokogiri (1.13.4-arm64-darwin)
       racc (~> 1.4)
     nokogiri (1.13.4-x86_64-linux)
       racc (~> 1.4)
+    path_expander (1.1.1)
     racc (1.6.0)
     rack (2.2.3)
     rack-test (1.1.0)
@@ -98,6 +101,7 @@ DEPENDENCIES
   debug
   kredis
   minitest (~> 5.0)
+  minitest-sprint (~> 1.2)
   railties
   rake (~> 13.0)
   sqlite3

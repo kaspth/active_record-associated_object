@@ -15,3 +15,5 @@ gem "sqlite3"
 gem "kredis"
 gem "activejob"
 gem "railties"
+
+gem "minitest-sprint", "~> 1.2"
