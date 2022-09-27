@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    active_record-associated_object (0.3.0)
+    active_record-associated_object (0.4.0)
       active_job-performs
       activerecord (>= 6.1)
 
