@@ -39,4 +39,5 @@ class ActiveRecord::AssociatedObject
   end
 end
 
+require_relative "associated_object/version"
 require_relative "associated_object/railtie" if defined?(Rails::Railtie)
