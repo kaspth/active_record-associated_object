@@ -16,7 +16,7 @@ class ActiveRecord::AssociatedObject
     end
 
     def respond_to_missing?(...) = record_klass.respond_to?(...) || super
-    delegate :unscoped, :transaction, to: :record_klass
+    delegate :unscoped, :transaction, :primary_key, to: :record_klass
 
     def method_missing(method, ...)
       if !record_klass.respond_to?(method) then super else

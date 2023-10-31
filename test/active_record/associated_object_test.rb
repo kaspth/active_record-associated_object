@@ -45,6 +45,10 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
     assert_equal @post, @publisher.transaction { Post.first }
   end
 
+  def test_primary_key_passthrough
+    assert_equal Post.primary_key, Post::Publisher.primary_key
+  end
+
   def test_callback_passing
     @post.update title: "Updated title"
     assert_equal "Updated title", @publisher.captured_title
