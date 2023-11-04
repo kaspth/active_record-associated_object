@@ -16,6 +16,7 @@ require "minitest/autorun"
 
 # Simulate Rails app boot and run the railtie initializers manually.
 ActiveRecord::AssociatedObject::Railtie.run_initializers
+ActiveSupport.run_load_hooks :after_initialize, Rails::Railtie
 
 Kredis.configurator = Class.new { def config_for(name) { db: "1" } end }.new
 
