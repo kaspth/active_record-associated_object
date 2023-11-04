@@ -29,3 +29,6 @@ class Post::Publisher < ApplicationRecord::AssociatedObject
     self.performed = true
   end
 end
+
+class Author::Archiver < ApplicationRecord::AssociatedObject
+end
