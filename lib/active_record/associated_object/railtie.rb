@@ -1,11 +1,15 @@
 class ActiveRecord::AssociatedObject::Railtie < Rails::Railtie
   initializer "integrations.include" do
-    ActiveRecord::AssociatedObject.include Kredis::Attributes       if defined?(Kredis)
-    ActiveRecord::AssociatedObject.include GlobalID::Identification if defined?(GlobalID)
+    config.after_initialize do
+      ActiveRecord::AssociatedObject.include Kredis::Attributes       if defined?(Kredis)
+      ActiveRecord::AssociatedObject.include GlobalID::Identification if defined?(GlobalID)
 
-    ActiveSupport.on_load :active_job do
-      require "active_job/performs"
-      ActiveRecord::AssociatedObject.extend ActiveJob::Performs
+      ActiveSupport.on_load :active_job do
+        require "active_job/performs"
+        ActiveRecord::AssociatedObject.extend ActiveJob::Performs
+      rescue LoadError
+        # We haven't bundled active_job-performs, so we're continuing without it.
+      end
     end
   end
 
