@@ -44,11 +44,16 @@ class Post::Publisher < ActiveRecord::AssociatedObject
 end
 ```
 
-### How `performs` removes Active Job boilerplate
+### Remove Active Job boilerplate with `performs`
 
-`performs` comes from the `active_job-performs` gem and is automatically bundled with `ActiveRecord::AssociatedObject`.
+If you also bundle [`active_job-performs`](https://github.com/kaspth/active_job-performs) in your Gemfile like this:
 
-With an associated object like this:
+```ruby
+gem "active_job-performs"
+gem "active_record-associated_object"
+```
+
+Every associated object now has access to the `performs` macro, so you can do this:
 
 ```ruby
 class Post::Publisher < ActiveRecord::AssociatedObject
@@ -64,7 +69,7 @@ class Post::Publisher < ActiveRecord::AssociatedObject
 end
 ```
 
-is equivalent to:
+which is equivalent to this:
 
 ```ruby
 class Post::Publisher < ActiveRecord::AssociatedObject
@@ -96,6 +101,8 @@ class Post::Publisher < ActiveRecord::AssociatedObject
   end
 end
 ```
+
+See the `ActiveJob::Performs` README for more details.
 
 ### Passing callbacks onto the associated object
 
