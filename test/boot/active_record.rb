@@ -18,6 +18,8 @@ end
 
 class Author < ApplicationRecord
   has_many :posts
+
+  has_object :archiver
 end
 
 class Post < ApplicationRecord

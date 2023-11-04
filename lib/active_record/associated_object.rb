@@ -9,10 +9,10 @@ class ActiveRecord::AssociatedObject
         raise ArgumentError, "#{record_klass} isn't valid; can only associate with ActiveRecord::Base subclasses"
       end
 
-      alias_method record_name, :record
-      define_singleton_method(:record_klass)   { record_klass }
-      define_singleton_method(:attribute_name) { attribute_name }
-      delegate :record_klass, :attribute_name, to: :class
+      klass.alias_method record_name, :record
+      klass.define_singleton_method(:record_klass)   { record_klass }
+      klass.define_singleton_method(:attribute_name) { attribute_name }
+      klass.delegate :record_klass, :attribute_name, to: :class
     end
 
     def respond_to_missing?(...) = record_klass.respond_to?(...) || super

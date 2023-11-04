@@ -9,6 +9,9 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
     super
     @post = Post.first
     @publisher = @post.publisher
+
+    @author = Author.first
+    @archiver = @author.archiver
   end
 
   def test_associated_object_alias
@@ -32,6 +35,12 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
 
     assert_equal :publisher, @publisher.attribute_name
     assert_equal :publisher, Post::Publisher.attribute_name
+
+    assert_equal Author, @archiver.record_klass
+    assert_equal Author, Author::Archiver.record_klass
+
+    assert_equal :archiver, @archiver.attribute_name
+    assert_equal :archiver, Author::Archiver.attribute_name
   end
 
   def test_unscoped_passthrough
