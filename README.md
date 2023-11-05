@@ -69,6 +69,12 @@ class Post::Comment::Rating < ActiveRecord::AssociatedObject
 end
 ```
 
+### Composite primary keys
+
+We support Active Record models with composite primary keys out of the box.
+
+Just setup the associated objects like the above examples and you've got GlobalID/Active Job and Kredis support automatically.
+
 ### Remove Active Job boilerplate with `performs`
 
 If you also bundle [`active_job-performs`](https://github.com/kaspth/active_job-performs) in your Gemfile like this:
