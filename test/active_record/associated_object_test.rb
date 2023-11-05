@@ -20,6 +20,9 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
   def test_associated_object_alias
     assert_equal @post, @publisher.post
     assert_equal @publisher.post, @publisher.record
+
+    assert_equal @comment, @rating.comment
+    assert_equal @rating.comment, @rating.record
   end
 
   def test_associated_object_method_missing_extraction
