@@ -2,7 +2,7 @@ class ActiveRecord::AssociatedObject
   class << self
     def inherited(klass)
       record_klass   = klass.module_parent
-      record_name    = klass.module_parent_name.underscore
+      record_name    = klass.module_parent_name.demodulize.underscore
       attribute_name = klass.to_s.demodulize.underscore.to_sym
 
       unless record_klass.respond_to?(:descends_from_active_record?) && record_klass.descends_from_active_record?

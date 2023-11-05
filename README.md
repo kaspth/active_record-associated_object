@@ -44,6 +44,31 @@ class Post::Publisher < ActiveRecord::AssociatedObject
 end
 ```
 
+### Namespaced models
+
+If you have a namespaced Active Record like this:
+
+```ruby
+# app/models/post/comment.rb
+class Post::Comment < ApplicationRecord
+  belongs_to :post
+
+  has_object :rating
+end
+```
+
+You can define the associated object in the same way it was done for `Post::Publisher` above, within the `Post::Comment` namespace:
+
+```ruby
+# app/models/post/comment/rating.rb
+class Post::Comment::Rating < ActiveRecord::AssociatedObject
+  def great?
+    # A `comment` method is generated to access the associated comment. There's also a `record` alias available.
+    comment.author.subscriber_of? comment.post.author
+  end
+end
+```
+
 ### Remove Active Job boilerplate with `performs`
 
 If you also bundle [`active_job-performs`](https://github.com/kaspth/active_job-performs) in your Gemfile like this:

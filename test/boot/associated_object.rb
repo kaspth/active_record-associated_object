@@ -37,7 +37,6 @@ class Post::Comment::Rating < ActiveRecord::AssociatedObject
   kredis_flag :moderated
 
   def great?
-    # TODO: Fix namespaced records generating a :"post/comments" alias instead of `post_comment` or `comment`
-    record.body == "First!!!!"
+    comment.body == "First!!!!"
   end
 end
