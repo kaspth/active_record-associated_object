@@ -12,6 +12,9 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
 
     @author = Author.first
     @archiver = @author.archiver
+
+    @comment = @author.comments.first
+    @rating = @comment.rating
   end
 
   def test_associated_object_alias
@@ -27,6 +30,14 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
     assert_equal @publisher,     Post::Publisher.find_by(title: Post.first.title)
     assert_equal @publisher,     Post::Publisher.find_by(author: Author.first)
     assert_equal [ @publisher ], Post::Publisher.where(id: 1)
+
+    assert_equal @rating,     Post::Comment::Rating.first
+    assert_equal @rating,     Post::Comment::Rating.last
+    assert_equal @rating,     Post::Comment::Rating.find([@post, @author])
+    assert_equal @rating,     Post::Comment::Rating.find_by(Post::Comment::Rating.primary_key => [[@post.id, @author.id]])
+    assert_equal @rating,     Post::Comment::Rating.find_by(body: "First!!!!")
+    assert_equal @rating,     Post::Comment::Rating.find_by(author: Author.first)
+    assert_equal [ @rating ], Post::Comment::Rating.where(Post::Comment::Rating.primary_key => [[@post.id, @author.id]])
   end
 
   def test_introspection
@@ -41,6 +52,12 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
 
     assert_equal :archiver, @archiver.attribute_name
     assert_equal :archiver, Author::Archiver.attribute_name
+
+    assert_equal Post::Comment, @rating.record_klass
+    assert_equal Post::Comment, Post::Comment::Rating.record_klass
+
+    assert_equal :rating, @rating.attribute_name
+    assert_equal :rating, Post::Comment::Rating.attribute_name
   end
 
   def test_unscoped_passthrough
@@ -74,6 +91,10 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
       assert_equal "post:publishers:1:publish_at", @publisher.publish_at.key
       assert_equal publish_at, @publisher.publish_at.value
     end
+
+    @rating.moderated.mark
+    assert_equal "post:comment:ratings:[1, 1]:moderated", @rating.moderated.key
+    assert @rating.moderated?
   end
 
   def test_global_id_integration
@@ -83,6 +104,14 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
     assert_raises(ActiveRecord::RecordNotFound) { GlobalID::Locator.locate_many([ Post.new(id: 2).publisher.to_gid.to_s ]) }
     assert_equal [ @publisher ], GlobalID::Locator.locate_many([ @publisher.to_gid.to_s ])
     assert_equal [ @publisher ], GlobalID::Locator.locate_many([ @publisher.to_gid.to_s, Post.new(id: 2).publisher.to_gid.to_s ], ignore_missing: true)
+
+    assert_equal "gid://test/Post::Comment::Rating/1/1", @rating.to_gid.to_s
+    assert_equal @rating, GlobalID.find(@rating.to_gid.to_s)
+
+    missing_rating = Post::Comment.new(post_id: 2, author_id: 10).rating
+    assert_raises(ActiveRecord::RecordNotFound) { GlobalID::Locator.locate_many([ missing_rating.to_gid.to_s ]) }
+    assert_equal [ @rating ], GlobalID::Locator.locate_many([ @rating.to_gid.to_s ])
+    assert_equal [ @rating ], GlobalID::Locator.locate_many([ @rating.to_gid.to_s, missing_rating.to_gid.to_s ], ignore_missing: true)
   end
 
   def test_active_job_integration
@@ -93,5 +122,9 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
     end
 
     assert @publisher.performed
+  end
+
+  def test_calling_method
+    assert @rating.great?
   end
 end

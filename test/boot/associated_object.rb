@@ -8,6 +8,9 @@ end
 
 class ApplicationRecord::AssociatedObject < ActiveRecord::AssociatedObject; end
 
+class Author::Archiver < ApplicationRecord::AssociatedObject
+end
+
 class Post::Publisher < ApplicationRecord::AssociatedObject
   mattr_accessor :performed,      default: false
   mattr_accessor :captured_title, default: nil
@@ -30,5 +33,11 @@ class Post::Publisher < ApplicationRecord::AssociatedObject
   end
 end
 
-class Author::Archiver < ApplicationRecord::AssociatedObject
+class Post::Comment::Rating < ActiveRecord::AssociatedObject
+  kredis_flag :moderated
+
+  def great?
+    # TODO: Fix namespaced records generating a :"post/comments" alias instead of `post_comment` or `comment`
+    record.body == "First!!!!"
+  end
 end

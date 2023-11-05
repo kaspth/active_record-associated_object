@@ -29,7 +29,8 @@ require_relative "boot/active_record"
 require_relative "boot/associated_object"
 
 author = Author.create!
-author.posts.create! id: 1, title: "First post"
+post = author.posts.create! id: 1, title: "First post"
+author.comments.create! post: post, body: "First!!!!"
 
 class ActiveSupport::TestCase
   teardown { Kredis.clear_all }
