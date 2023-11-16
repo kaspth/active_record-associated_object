@@ -167,7 +167,7 @@ end
 >
 > Anyone reading this, if you haven't checked them out yet, I highly recommend it.
 
-- @natematykiewicz
+- [@natematykiewicz](https://github.com/natematykiewicz)
 
 ## Risks of depending on this gem
 
