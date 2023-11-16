@@ -161,6 +161,14 @@ class Post::Publisher < ActiveRecord::AssociatedObject
 end
 ```
 
+## Testimonials
+
+> We're running `ActiveRecord::AssociatedObject` and `ActiveJob::Performs` (via the associated object) in 3 spots in production so far. It massively improved how I was architecting a new feature. I put a PR up for review and a coworker loved how organized and easy to follow the large PR was because of those 2 gems. I'm now working on another PR in our app where I'm using them again. I keep seeing use-cases for them now. I love it. Thank you for these gems!
+>
+> Anyone reading this, if you haven't checked them out yet, I highly recommend it.
+
+- @natematykiewicz
+
 ## Risks of depending on this gem
 
 This gem is relatively tiny and I'm not expecting more significant changes on it, for right now. It's unofficial and not affiliated with Rails core.
