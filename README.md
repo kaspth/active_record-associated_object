@@ -163,9 +163,15 @@ end
 
 ## Testimonials
 
+Here's from a user and how they started:
+
 > We're running `ActiveRecord::AssociatedObject` and `ActiveJob::Performs` (via the associated object) in 3 spots in production so far. It massively improved how I was architecting a new feature. I put a PR up for review and a coworker loved how organized and easy to follow the large PR was because of those 2 gems. I'm now working on another PR in our app where I'm using them again. I keep seeing use-cases for them now. I love it. Thank you for these gems!
 >
 > Anyone reading this, if you haven't checked them out yet, I highly recommend it.
+
+And here's how they were liking it about a month later:
+
+> Just checking in to say we've added like another 4 associated objects to production since my last message. ActiveRecord::AssociatedObject + ActiveJob::Performs is like a 1-2 punch super power. I'm a bit surprised that this isn't Rails core to be honest. I want to migrate so much of our code over to this. It feels much more organized and sane. Then my app/jobs folder won't have much in it because most jobs will actually be via some associated object's _later method. app/jobs will then basically be cron-type things (deactivate any expired subscriptions).
 
 - [@natematykiewicz](https://github.com/natematykiewicz)
 
