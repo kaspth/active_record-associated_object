@@ -1,81 +1,174 @@
 # ActiveRecord::AssociatedObject
 
-Associate a Ruby PORO with an Active Record class and have it quack like one. Build and extend your domain model relying on the Active Record association to make it unique.
+Rails applications can end up with models that get way too big, and so far, the
+Ruby community response has been Service Objects. But sometimes `app/services`
+can turn into another junk drawer that doesn't help you build and make concepts for your Domain Model.
 
-## Usage
+`ActiveRecord::AssociatedObject` takes that head on. Associated Objects are a new domain concept, a context object, that's meant to
+help you tease out collaborator objects for your Active Record models.
+
+They're essentially POROs that you associate with an Active Record model to get benefits both in simpler code as well as automatic `app/models` organization.
+
+Let's look at an example. Say you have a `Post` model that encapsulates a blog post in a Content-Management-System:
 
 ```ruby
-# app/models/post.rb
-class Post < ActiveRecord::Base
-  # `has_object` defines a `publisher` method that calls Post::Publisher.new(post).
-  has_object :publisher
-end
-
-# app/models/post/publisher.rb
-class Post::Publisher
-  def initialize(post)
-    @post = post
-  end
+class Post < ApplicationRecord
 end
 ```
 
-If you want Active Job, GlobalID and Kredis integration you can also have `Post::Publisher` inherit from `ActiveRecord::AssociatedObject`. This extends the standard PORO with details from the `Post::` namespace and the post primary key.
+You've identified that several things need to happen when a post gets published.
+But where does that behavior live; in `Post`? That might get messy.
+
+If we put it in a classic Service Object, we've got access to a `def call` method and that's it — what if we need other methods that operate on the state? And then having `PublishPost` or a similar ad-hoc name in `app/services` can pollute that folder over time.
+
+What if we instead identified a `Publisher` collaborator object? What if we required it to be placed within `Post::` to automatically help connote the object as belonging to and collaborating with `Post`? Then we'd get `app/models/post/publisher.rb` which guides naming and gives more organization in your app automatically by following that convention — and helps prevent that junk drawer.
+
+This is what Associated Objects are! So we could define it like this:
 
 ```ruby
 # app/models/post/publisher.rb
 class Post::Publisher < ActiveRecord::AssociatedObject
-  # ActiveRecord::AssociatedObject defines initialize(post) automatically. It's derived from the `Post::` namespace.
+end
+```
 
-  kredis_datetime :publish_at # Kredis integration generates a "post:publishers:<post_id>:publish_at" key.
+And then you can declare it in `Post`:
 
-  # `performs` builds a `Post::Publisher::PublishJob` and routes configs over to it.
-  performs :publish, queue_as: :important, discard_on: SomeError do
-    retry_on TimeoutError, wait: :exponentially_longer
-  end
+```ruby
+# app/models/post.rb
+class Post < ApplicationRecord
+  has_object :publisher
+end
+```
 
+Note: There isn't anything super special happening yet. Here's essentially what's happening under the hood:
+
+```ruby
+class Post::Publisher
+  attr_reader :post
+  def initialize(post) = @post = post
+end
+
+class Post < ApplicationRecord
+  def publisher = Post::Publisher.new(self)
+end
+```
+
+See how we're always expecting a link to the model, here `post`?
+
+Because of that, you can rely on `post` from the associated object:
+
+```ruby
+class Post::Publisher < ActiveRecord::AssociatedObject
   def publish
     # `transaction` is syntactic sugar for `post.transaction` here.
     transaction do
-      # A `post` method is generated to access the associated post. There's also a `record` alias available.
       post.update! published: true
       post.subscribers.post_published post
+
+      # There's also a `record` alias available if you prefer the more general reading version:
+      # record.update! published: true
+      # record.subscribers.post_published record
     end
   end
 end
 ```
 
-### Namespaced models
+### Forwarding callbacks onto the associated object
 
-If you have a namespaced Active Record like this:
+To further help illustrate how your collaborator Associated Objects interact with your domain model, you can forward callbacks.
+
+Say we wanted to have to our `publisher` automatically publish posts after they're created. Or we need to refresh a publishing after a post has been touched. Or what if we don't want posts to be destroyed if they're published due to HAHA BUSINESS rules?
+
+So `has_object` can state this and forward those callbacks onto the Associated Object:
 
 ```ruby
-# app/models/post/comment.rb
-class Post::Comment < ApplicationRecord
-  belongs_to :post
+class Post < ActiveRecord::Base
+  # Passing `true`
+  has_object :publisher, after_create_commit: :publish,
+    after_touch: true, before_destroy: :prevent_errant_post_destroy
 
-  has_object :rating
+  # The above is the same as writing:
+  after_create_commit { publisher.publish }
+  after_touch { publisher.after_touch }
+  before_destroy { publisher.prevent_errant_post_destroy }
 end
-```
 
-You can define the associated object in the same way it was done for `Post::Publisher` above, within the `Post::Comment` namespace:
+class Post::Publisher < ActiveRecord::AssociatedObject
+  def publish
+  end
 
-```ruby
-# app/models/post/comment/rating.rb
-class Post::Comment::Rating < ActiveRecord::AssociatedObject
-  def great?
-    # A `comment` method is generated to access the associated comment. There's also a `record` alias available.
-    comment.author.subscriber_of? comment.post.author
+  def after_touch
+    # Respond to the after_touch on the Post.
+  end
+
+  def prevent_errant_post_destroy
+    # Passed callbacks can throw :abort too, and in this example prevent post.destroy.
+    throw :abort if haha_business?
   end
 end
 ```
 
-### Composite primary keys
+### Primary Benefit: Organization through Convention
 
-We support Active Record models with composite primary keys out of the box.
+The primary benefit for right now is that by focusing the concept of namespaced Collaborator Objects through Associated Objects, you will start seeing them when you're modelling new features and it'll change how you structure and write your apps.
 
-Just setup the associated objects like the above examples and you've got GlobalID/Active Job and Kredis support automatically.
+This is what [@natematykiewicz](https://github.com/natematykiewicz) found when they started using the gem (we'll get to `ActiveJob::Performs` soon):
 
-### Remove Active Job boilerplate with `performs`
+> We're running `ActiveRecord::AssociatedObject` and `ActiveJob::Performs` (via the associated object) in 3 spots in production so far. It massively improved how I was architecting a new feature. I put a PR up for review and a coworker loved how organized and easy to follow the large PR was because of those 2 gems. I'm now working on another PR in our app where I'm using them again. I keep seeing use-cases for them now. I love it. Thank you for these gems!
+>
+> Anyone reading this, if you haven't checked them out yet, I highly recommend it.
+
+And about a month later it was still holding up:
+
+> Just checking in to say we've added like another 4 associated objects to production since my last message. `ActiveRecord::AssociatedObject` + `ActiveJob::Performs` is like a 1-2 punch super power. I'm a bit surprised that this isn't Rails core to be honest. I want to migrate so much of our code over to this. It feels much more organized and sane. Then my app/jobs folder won't have much in it because most jobs will actually be via some associated object's _later method. app/jobs will then basically be cron-type things (deactivate any expired subscriptions).
+
+Let's look at testing, then we'll get to passing these POROs to jobs like the quotes mentioned!
+
+### A Quick Aside: Testing Associated Objects
+
+Follow the `app/models/post.rb` and `app/models/post/publisher.rb` naming structure in your tests and add `test/models/post/publisher_test.rb`.
+
+Then test it like any other object:
+
+```ruby
+# test/models/post/publisher_test.rb
+class Post::PublisherTest < ActiveSupport::TestCase
+  # You can use Fixtures/FactoryBot to get a `post` and then extract its `publisher`:
+  setup { @publisher = posts(:one).publisher }
+  setup { @publisher = FactoryBot.build(:post).publisher }
+
+  test "publish updates the post" do
+    @publisher.publish
+    assert @publisher.post.reload.published?
+  end
+end
+```
+
+### Active Job integration via GlobalID
+
+Because `Post.find(1)` returns a unique `Post`, we can and have added `Post.find(1).publisher` or `Post::Publisher.find(1)` to return a unique publisher.
+
+With this, we can implement `GlobalID::Identification` and have automatic Active Job support:
+
+```ruby
+class Post::Publisher < ActiveRecord::AssociatedObject
+  class PublishJob < ApplicationJob
+    def perform(publisher) = publisher.publish
+  end
+
+  def publish_later
+    PublishJob.perform_later self # We're passing this PORO to the job!
+  end
+
+  def publish
+    # …
+  end
+end
+```
+
+This pattern of a job `perform` consisting of calling an instance method on a sole domain object is ripe for a convention, here's how to do that.
+
+#### Remove Active Job boilerplate with `performs`
 
 If you also bundle [`active_job-performs`](https://github.com/kaspth/active_job-performs) in your Gemfile like this:
 
@@ -100,7 +193,7 @@ class Post::Publisher < ActiveRecord::AssociatedObject
 end
 ```
 
-which is equivalent to this:
+which spares you writing all this:
 
 ```ruby
 class Post::Publisher < ActiveRecord::AssociatedObject
@@ -112,7 +205,7 @@ class Post::Publisher < ActiveRecord::AssociatedObject
   # Individual method jobs inherit from the `Post::Publisher::Job` defined above.
   class PublishJob < Job
     def perform(publisher, *arguments, **options)
-      # GlobalID integration means associated objects can be passed into jobs like Active Records, i.e. we don't have to do `post.publisher`.
+      # Here's the GlobalID integration again, i.e. we don't have to do `post.publisher`.
       publisher.publish(*arguments, **options)
     end
   end
@@ -133,47 +226,60 @@ class Post::Publisher < ActiveRecord::AssociatedObject
 end
 ```
 
-See the `ActiveJob::Performs` README for more details.
-
-### Passing callbacks onto the associated object
-
-`has_object` accepts a hash of callbacks to pass.
+Note: you can also pass more complex configuration like this:
 
 ```ruby
-class Post < ActiveRecord::Base
-  # Callbacks can be passed too to a specific method.
-  has_object :publisher, after_touch: true, before_destroy: :prevent_errant_post_destroy
-
-  # The above is the same as writing:
-  after_touch { publisher.after_touch }
-  before_destroy { publisher.prevent_errant_post_destroy }
+performs :publish, queue_as: :important, discard_on: SomeError do
+  retry_on TimeoutError, wait: :exponentially_longer
 end
+```
 
-class Post::Publisher < ActiveRecord::AssociatedObject
-  def after_touch
-    # Respond to the after_touch on the Post.
-  end
+See the `ActiveJob::Performs` README for more details.
 
-  def prevent_errant_post_destroy
-    # Passed callbacks can throw :abort too, and in this example prevent post.destroy.
-    throw :abort if haha_business?
+### Namespaced models
+
+If you have a namespaced Active Record like this:
+
+```ruby
+# app/models/post/comment.rb
+class Post::Comment < ApplicationRecord
+  belongs_to :post
+  belongs_to :creator, class_name: "User"
+
+  has_object :rating
+end
+```
+
+You can define the associated object in the same way it was done for `Post::Publisher` above, within the `Post::Comment` namespace:
+
+```ruby
+# app/models/post/comment/rating.rb
+class Post::Comment::Rating < ActiveRecord::AssociatedObject
+  def good?
+    # A `comment` method is generated to access the associated comment. There's also a `record` alias available.
+    comment.creator.subscriber_of? comment.post.creator
   end
 end
 ```
 
-## Testimonials
+And then test it in `test/models/post/comment/rating_test.rb`:
 
-Here's from a user and how they started:
+```ruby
+class Post::Comment::RatingTest < ActiveSupport::TestCase
+  setup { @rating = posts(:one).comments.first.rating }
+  setup { @rating = FactoryBot.build(:post_comment).rating }
 
-> We're running `ActiveRecord::AssociatedObject` and `ActiveJob::Performs` (via the associated object) in 3 spots in production so far. It massively improved how I was architecting a new feature. I put a PR up for review and a coworker loved how organized and easy to follow the large PR was because of those 2 gems. I'm now working on another PR in our app where I'm using them again. I keep seeing use-cases for them now. I love it. Thank you for these gems!
->
-> Anyone reading this, if you haven't checked them out yet, I highly recommend it.
+  test "pretty, pretty, pretty, pretty good" do
+    assert @rating.good?
+  end
+end
+```
 
-And here's how they were liking it about a month later:
+### Composite primary keys
 
-> Just checking in to say we've added like another 4 associated objects to production since my last message. ActiveRecord::AssociatedObject + ActiveJob::Performs is like a 1-2 punch super power. I'm a bit surprised that this isn't Rails core to be honest. I want to migrate so much of our code over to this. It feels much more organized and sane. Then my app/jobs folder won't have much in it because most jobs will actually be via some associated object's _later method. app/jobs will then basically be cron-type things (deactivate any expired subscriptions).
+We support Active Record models with composite primary keys out of the box.
 
-- [@natematykiewicz](https://github.com/natematykiewicz)
+Just setup the associated objects like the above examples and you've got GlobalID/Active Job and Kredis support automatically.
 
 ## Risks of depending on this gem
 
