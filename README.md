@@ -49,7 +49,7 @@ class Post::Publisher
 end
 
 class Post < ApplicationRecord
-  def publisher = Post::Publisher.new(self)
+  def publisher = @publisher ||= Post::Publisher.new(self)
 end
 ```
 
