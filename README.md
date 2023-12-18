@@ -21,9 +21,9 @@ But where does that behavior live; in `Post`? That might get messy.
 
 If we put it in a classic Service Object, we've got access to a `def call` method and that's it — what if we need other methods that operate on the state? And then having `PublishPost` or a similar ad-hoc name in `app/services` can pollute that folder over time.
 
-What if we instead identified a `Publisher` collaborator object? What if we required it to be placed within `Post::` to automatically help connote the object as belonging to and collaborating with `Post`? Then we'd get `app/models/post/publisher.rb` which guides naming and gives more organization in your app automatically by following that convention — and helps prevent that junk drawer.
+What if we instead identified a `Publisher` collaborator object, a Ruby class that handles publishing? What if we required it to be placed within `Post::` to automatically help connote the object as belonging to and collaborating with `Post`? Then we'd get `app/models/post/publisher.rb` which guides naming and gives more organization in your app automatically through that convention — and helps prevent a junk drawer from forming.
 
-This is what Associated Objects are! So we could define it like this:
+This is what Associated Objects are! We'd define it like this:
 
 ```ruby
 # app/models/post/publisher.rb
@@ -40,7 +40,7 @@ class Post < ApplicationRecord
 end
 ```
 
-Note: There isn't anything super special happening yet. Here's essentially what's happening under the hood:
+There isn't anything super special happening yet. Here's essentially what's happening under the hood:
 
 ```ruby
 class Post::Publisher
@@ -52,6 +52,9 @@ class Post < ApplicationRecord
   def publisher = @publisher ||= Post::Publisher.new(self)
 end
 ```
+
+> [!TIP]
+> `has_object` only requires a namespace and an initializer that takes a single argument. The above `Post::Publisher` is perfectly valid as an Associated Object — same goes for `class Post::Publisher < Data.define(:post); end`.
 
 See how we're always expecting a link to the model, here `post`?
 
@@ -77,7 +80,7 @@ end
 
 To further help illustrate how your collaborator Associated Objects interact with your domain model, you can forward callbacks.
 
-Say we wanted to have to our `publisher` automatically publish posts after they're created. Or we need to refresh a publishing after a post has been touched. Or what if we don't want posts to be destroyed if they're published due to HAHA BUSINESS rules?
+Say we wanted to have our `publisher` automatically publish posts after they're created. Or we need to refresh a publishing after a post has been touched. Or what if we don't want posts to be destroyed if they're published due to HAHA BUSINESS rules?
 
 So `has_object` can state this and forward those callbacks onto the Associated Object:
 
@@ -180,7 +183,7 @@ gem "active_job-performs"
 gem "active_record-associated_object"
 ```
 
-Every associated object now has access to the `performs` macro, so you can do this:
+Every Associated Object (and Active Records too) now has access to the `performs` macro, so you can do this:
 
 ```ruby
 class Post::Publisher < ActiveRecord::AssociatedObject
@@ -207,25 +210,16 @@ class Post::Publisher < ActiveRecord::AssociatedObject
 
   # Individual method jobs inherit from the `Post::Publisher::Job` defined above.
   class PublishJob < Job
-    def perform(publisher, *arguments, **options)
-      # Here's the GlobalID integration again, i.e. we don't have to do `post.publisher`.
-      publisher.publish(*arguments, **options)
-    end
+    # Here's the GlobalID integration again, i.e. we don't have to do `post.publisher`.
+    def perform(publisher, *, **) = publisher.publish(*, **)
   end
 
   class RetractJob < Job
-    def perform(publisher, *arguments, **options)
-      publisher.retract(*arguments, **options)
-    end
+    def perform(publisher, *, **) = publisher.retract(*, **)
   end
 
-  def publish_later(*arguments, **options)
-    PublishJob.perform_later(self, *arguments, **options)
-  end
-
-  def retract_later(*arguments, **options)
-    RetractJob.perform_later(self, *arguments, **options)
-  end
+  def publish_later(*, **) = PublishJob.perform_later(self, *, **)
+  def retract_later(*, **) = RetractJob.perform_later(self, *, **)
 end
 ```
 
