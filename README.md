@@ -231,7 +231,7 @@ performs :publish, queue_as: :important, discard_on: SomeError do
 end
 ```
 
-See the `ActiveJob::Performs` README for more details.
+See [the `ActiveJob::Performs` README](https://github.com/kaspth/active_job-performs) for more details.
 
 ### Namespaced models
 
