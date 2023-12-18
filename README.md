@@ -146,9 +146,7 @@ end
 
 ### Active Job integration via GlobalID
 
-Because `Post.find(1)` returns a unique `Post`, we can and have added `Post.find(1).publisher` or `Post::Publisher.find(1)` to return a unique publisher.
-
-With this, we can implement `GlobalID::Identification` and have automatic Active Job support:
+Associated Objects include `GlobalID::Identification` and have automatic Active Job serialization support that looks like this:
 
 ```ruby
 class Post::Publisher < ActiveRecord::AssociatedObject
@@ -165,6 +163,11 @@ class Post::Publisher < ActiveRecord::AssociatedObject
   end
 end
 ```
+
+> [!NOTE]
+> Internally, Active Job serializes Active Records as GlobalIDs. Active Record also includes `GlobalID::Identification`, which requires the `find` and `where(id:)` class methods.
+>
+> We've added `Post::Publisher.find` & `Post::Publisher.where(id:)` that calls `Post.find(id).publisher` and `Post.where(id:).map(&:publisher)` respectively.
 
 This pattern of a job `perform` consisting of calling an instance method on a sole domain object is ripe for a convention, here's how to do that.
 
