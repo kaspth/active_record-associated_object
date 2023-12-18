@@ -2,20 +2,20 @@
 
 require "test_helper"
 
-class ActiveRecord::AssociatedObject::ObjectAssociationTest < Minitest::Test
-  def setup
-    super
-    @post = Post.first
+class ActiveRecord::AssociatedObject::ObjectAssociationTest < ActiveSupport::TestCase
+  test "standard PORO can be accessed" do
+    assert_kind_of Post::Mailroom, Post.first.mailroom
+
+    author = Author.first
+    assert_kind_of Author::Archiver,      author.archiver
+    assert_kind_of Author::Classified,    author.classified
+    assert_kind_of Author::Fortification, author.fortification
   end
 
-  def test_standard_PORO_can_be_accessed
-    assert_kind_of Post::Mailroom, @post.mailroom
-  end
-
-  def test_callback_passing_for_standard_PORO
+  test "callback passing for standard PORO" do
     Post::Mailroom.touched = false
 
-    @post.touch
-    assert @post.mailroom.touched
+    Post.first.touch
+    assert Post.first.mailroom.touched
   end
 end

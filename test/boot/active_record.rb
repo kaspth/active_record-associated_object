@@ -26,7 +26,7 @@ class Author < ApplicationRecord
   has_many :posts,    dependent: :destroy
   has_many :comments, dependent: :destroy, class_name: "Post::Comment"
 
-  has_object :archiver
+  has_object :archiver, :classified, :fortification
 end
 
 class Post < ApplicationRecord

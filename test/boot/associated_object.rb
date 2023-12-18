@@ -11,6 +11,9 @@ class ApplicationRecord::AssociatedObject < ActiveRecord::AssociatedObject; end
 class Author::Archiver < ApplicationRecord::AssociatedObject
 end
 
+Author::Classified    = Data.define(:author)
+Author::Fortification = Data.define(:author)
+
 class Post::Publisher < ApplicationRecord::AssociatedObject
   mattr_accessor :performed,      default: false
   mattr_accessor :captured_title, default: nil

@@ -56,6 +56,9 @@ end
 > [!TIP]
 > `has_object` only requires a namespace and an initializer that takes a single argument. The above `Post::Publisher` is perfectly valid as an Associated Object — same goes for `class Post::Publisher < Data.define(:post); end`.
 
+> [!TIP]
+> You can pass multiple names too: `has_object :publisher, :classified, :fortification`. I recommend `-[i]er`, `-[i]ed` and `-ion` as the general naming conventions for your Associated Objects.
+
 See how we're always expecting a link to the model, here `post`?
 
 Because of that, you can rely on `post` from the associated object:
