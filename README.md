@@ -86,9 +86,9 @@ So `has_object` can state this and forward those callbacks onto the Associated O
 
 ```ruby
 class Post < ActiveRecord::Base
-  # Passing `true`
-  has_object :publisher, after_create_commit: :publish,
-    after_touch: true, before_destroy: :prevent_errant_post_destroy
+  # Passing `true` forwards the same name, e.g. `after_touch`.
+  has_object :publisher, after_touch: true, after_create_commit: :publish,
+    before_destroy: :prevent_errant_post_destroy
 
   # The above is the same as writing:
   after_create_commit { publisher.publish }
