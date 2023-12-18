@@ -11,8 +11,9 @@ class ApplicationRecord::AssociatedObject < ActiveRecord::AssociatedObject; end
 class Author::Archiver < ApplicationRecord::AssociatedObject
 end
 
-Author::Classified    = Data.define(:author)
-Author::Fortification = Data.define(:author)
+# TODO: Replace with Data.define once on Ruby 3.2.
+Author::Classified    = Struct.new(:author)
+Author::Fortification = Struct.new(:author)
 
 class Post::Publisher < ApplicationRecord::AssociatedObject
   mattr_accessor :performed,      default: false
