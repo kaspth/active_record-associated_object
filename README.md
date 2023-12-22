@@ -236,6 +236,19 @@ end
 
 See [the `ActiveJob::Performs` README](https://github.com/kaspth/active_job-performs) for more details.
 
+### Automatic Kredis integration
+
+We've got automatic Kredis integration for Associated Objects, so you can use any `kredis_*` type just like in Active Record classes:
+
+```ruby
+class Post::Publisher < ActiveRecord::AssociatedObject
+  kredis_datetime :publish_at # Uses a namespaced "post:publishers:<post_id>:publish_at" key.
+end
+```
+
+> [!INFO]
+> Under the hood, this reuses the same info we needed for automatic Active Job support. Namely, the Active Record class, here `Post`, and its `id`.
+
 ### Namespaced models
 
 If you have a namespaced Active Record like this:
