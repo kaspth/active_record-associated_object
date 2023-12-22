@@ -246,7 +246,7 @@ class Post::Publisher < ActiveRecord::AssociatedObject
 end
 ```
 
-> [!INFO]
+> [!NOTE]
 > Under the hood, this reuses the same info we needed for automatic Active Job support. Namely, the Active Record class, here `Post`, and its `id`.
 
 ### Namespaced models
