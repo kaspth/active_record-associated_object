@@ -139,4 +139,9 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
   def test_calling_method
     assert @rating.great?
   end
+
+  def test_record_klass_extension
+    assert_predicate Post::Comment.great.first, :rated_great?
+    assert_match /test\/boot\/associated_object/, Post::Comment.instance_method(:rated_great?).source_location.first
+  end
 end
