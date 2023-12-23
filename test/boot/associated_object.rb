@@ -1,3 +1,12 @@
+class ApplicationRecord::AssociatedObject < ActiveRecord::AssociatedObject; end
+
+class Author::Archiver < ApplicationRecord::AssociatedObject; end
+# TODO: Replace with Data.define once on Ruby 3.2.
+Author::Classified    = Struct.new(:author)
+Author::Fortification = Struct.new(:author)
+
+Author.has_object :archiver, :classified, :fortification
+
 class Post::Mailroom < Struct.new(:record)
   mattr_accessor :touched, default: false
 
@@ -5,15 +14,6 @@ class Post::Mailroom < Struct.new(:record)
     self.touched = true
   end
 end
-
-class ApplicationRecord::AssociatedObject < ActiveRecord::AssociatedObject; end
-
-class Author::Archiver < ApplicationRecord::AssociatedObject
-end
-
-# TODO: Replace with Data.define once on Ruby 3.2.
-Author::Classified    = Struct.new(:author)
-Author::Fortification = Struct.new(:author)
 
 class Post::Publisher < ApplicationRecord::AssociatedObject
   mattr_accessor :performed,      default: false
@@ -37,6 +37,9 @@ class Post::Publisher < ApplicationRecord::AssociatedObject
   end
 end
 
+Post.has_object :mailroom,  after_touch: true
+Post.has_object :publisher, after_update_commit: true, before_destroy: :prevent_errant_post_destroy
+
 class Post::Comment::Rating < ActiveRecord::AssociatedObject
   kredis_flag :moderated
 
@@ -44,3 +47,5 @@ class Post::Comment::Rating < ActiveRecord::AssociatedObject
     comment.body == "First!!!!"
   end
 end
+
+Post::Comment.has_object :rating
