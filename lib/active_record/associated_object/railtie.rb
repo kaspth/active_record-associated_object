@@ -16,7 +16,7 @@ class ActiveRecord::AssociatedObject::Railtie < Rails::Railtie
 
     ActiveSupport.on_load :active_record do
       require "active_record/associated_object/object_association"
-      extend ActiveRecord::AssociatedObject::ObjectAssociation
+      include ActiveRecord::AssociatedObject::ObjectAssociation
     end
   end
 end
