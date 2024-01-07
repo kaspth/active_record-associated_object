@@ -119,7 +119,7 @@ end
 Since `has_object` eager-loads the Associated Object class, you can also move
 any integrating code into a provided `extension` block:
 
-> [!INFO]
+> [!NOTE]
 > Technically, `extension` is just `Post.class_eval` but with syntactic sugar.
 
 ```ruby
@@ -169,7 +169,7 @@ module Post::Published
 end
 ```
 
-> [!INFO]
+> [!NOTE]
 > Notice how in the `extension` version you don't need to:
 >
 > - have a naming convention for Concerns and where to place them.
