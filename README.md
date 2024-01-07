@@ -49,9 +49,12 @@ class Post::Publisher
 end
 
 class Post < ApplicationRecord
-  def publisher = @publisher ||= Post::Publisher.new(self)
+  def publisher = (@associated_objects ||= {})[:publisher] ||= Post::Publisher.new(self)
 end
 ```
+
+Note: due to Ruby's Object Shapes, we use a single `@associated_objects` instance variable that's assigned to `nil` on `Post.new`. This prevents Active Record's from ballooning into many different shapes in Ruby's internals.
+We've fixed this so you don't need to care, but this is what's happening.
 
 > [!TIP]
 > `has_object` only requires a namespace and an initializer that takes a single argument. The above `Post::Publisher` is perfectly valid as an Associated Object — same goes for `class Post::Publisher < Data.define(:post); end`.
