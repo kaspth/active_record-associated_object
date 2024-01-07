@@ -1,5 +1,5 @@
 module ActiveRecord::AssociatedObject::ObjectAssociation
-  extend ActiveSupport::Concern
+  def self.included(klass) = klass.extend ClassMethods
 
   using Module.new {
     refine Module do
@@ -11,19 +11,10 @@ module ActiveRecord::AssociatedObject::ObjectAssociation
     end
   }
 
-  included do
-    class_attribute :associated_object_ivar_names,
-      default: [],
-      instance_accessor: false,
-      instance_predicate: false
-  end
-
-  class_methods do
+  module ClassMethods
     def has_object(*names, **callbacks)
-      self.associated_object_ivar_names += names.map { |n| :"@#{n}" }
-
       extend_source_from(names) do |name|
-        "def #{name}; @#{name} ||= #{self.name}::#{name.to_s.classify}.new(self); end"
+        "def #{name}; (@associated_objects ||= {})[:#{name}] ||= #{name.to_s.classify}.new(self); end"
       end
 
       extend_source_from(names) do |name|
@@ -35,10 +26,7 @@ module ActiveRecord::AssociatedObject::ObjectAssociation
   end
 
   def init_internals
-    self.class.associated_object_ivar_names.each do |name|
-      instance_variable_set(name, nil)
-    end
-
+    @associated_objects = nil
     super
   end
 end
