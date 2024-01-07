@@ -15,6 +15,10 @@ class ActiveRecord::AssociatedObject
       klass.delegate :record_klass, :attribute_name, to: :class
     end
 
+    def extension(&block)
+      record_klass.class_eval(&block)
+    end
+
     def respond_to_missing?(...) = record_klass.respond_to?(...) || super
     delegate :unscoped, :transaction, :primary_key, to: :record_klass
 

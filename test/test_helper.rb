@@ -18,7 +18,10 @@ require "minitest/autorun"
 ActiveRecord::AssociatedObject::Railtie.run_initializers
 ActiveSupport.run_load_hooks :after_initialize, Rails::Railtie
 
-Kredis.configurator = Class.new { def config_for(name) { db: "1" } end }.new
+Kredis.configurator = Class.new do
+  def config_for(name) = { db: "1" }
+  def root = Pathname.new(".")
+end.new
 
 GlobalID.app = "test"
 

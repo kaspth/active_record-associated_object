@@ -3,10 +3,9 @@
 require "test_helper"
 
 class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
-  include ActiveJob::TestHelper # TODO: Switch back to Minitest::Test, but need to fix `tagged_logger` NoMethodError.
+  include ActiveJob::TestHelper
 
-  def setup
-    super
+  setup do
     @post = Post.first
     @publisher = @post.publisher
 
@@ -17,7 +16,7 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
     @rating = @comment.rating
   end
 
-  def test_associated_object_alias
+  test "associated object alias" do
     assert_equal @post, @publisher.post
     assert_equal @publisher.post, @publisher.record
 
@@ -25,7 +24,7 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
     assert_equal @rating.comment, @rating.record
   end
 
-  def test_associated_object_method_missing_extraction
+  test "associated object method missing extraction" do
     assert_equal @publisher,     Post::Publisher.first
     assert_equal @publisher,     Post::Publisher.last
     assert_equal @publisher,     Post::Publisher.find(1)
@@ -43,7 +42,7 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
     assert_equal [ @rating ], Post::Comment::Rating.where(Post::Comment::Rating.primary_key => [[@post.id, @author.id]])
   end
 
-  def test_introspection
+  test "introspection" do
     assert_equal Post, @publisher.record_klass
     assert_equal Post, Post::Publisher.record_klass
 
@@ -63,22 +62,22 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
     assert_equal :rating, Post::Comment::Rating.attribute_name
   end
 
-  def test_unscoped_passthrough
+  test "unscoped passthrough" do
     # TODO: lol what's this actually supposed to do? Need to look more into GlobalID.
     # https://github.com/rails/globalid/blob/3ddb0f87fd5c22b3330ab2b4e5c41a85953ac886/lib/global_id/locator.rb#L164
     assert_equal [ @post ], @publisher.class.unscoped
   end
 
-  def test_transaction_passthrough
+  test "transaction passthrough" do
     assert_equal @post, Post::Publisher.transaction { Post.first }
     assert_equal @post, @publisher.transaction { Post.first }
   end
 
-  def test_primary_key_passthrough
+  test "primary_key passthrough" do
     assert_equal Post.primary_key, Post::Publisher.primary_key
   end
 
-  def test_callback_passing
+  test "callback forwarding" do
     @post.update title: "Updated title"
     assert_equal "Updated title", @publisher.captured_title
 
@@ -87,7 +86,7 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
     refute_empty Post.all
   end
 
-  def test_ivar_initialization
+  test "initialization's instance variables" do
     # Confirm that it initializes the instance variable to nil
     assert_includes Author.new.instance_variables, :@associated_objects
     assert_nil Author.new.instance_variable_get(:@associated_objects)
@@ -96,7 +95,7 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
     assert_equal Post.new.instance_variable_get(:@new_record), true
   end
 
-  def test_kredis_integration
+  test "kredis integration" do
     Time.new(2022, 4, 20, 1).tap do |publish_at|
       @publisher.publish_at.value = publish_at
 
@@ -109,7 +108,7 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
     assert @rating.moderated?
   end
 
-  def test_global_id_integration
+  test "global_id integration" do
     assert_equal "gid://test/Post::Publisher/1", @publisher.to_gid.to_s
     assert_equal @publisher, GlobalID.find(@publisher.to_gid.to_s)
 
@@ -126,7 +125,7 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
     assert_equal [ @rating ], GlobalID::Locator.locate_many([ @rating.to_gid.to_s, missing_rating.to_gid.to_s ], ignore_missing: true)
   end
 
-  def test_active_job_integration
+  test "Active Job integration" do
     @publisher.performed = false
 
     assert_performed_with job: Post::Publisher::PublishJob, args: [ @publisher ], queue: "important" do
@@ -136,7 +135,12 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
     assert @publisher.performed
   end
 
-  def test_calling_method
+  test "calling method" do
     assert @rating.great?
+  end
+
+  test "record_klass extension" do
+    assert_predicate Post::Comment.great.first, :rated_great?
+    assert_match /test\/boot\/associated_object/, Post::Comment.instance_method(:rated_great?).source_location.first
   end
 end

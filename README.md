@@ -114,6 +114,69 @@ class Post::Publisher < ActiveRecord::AssociatedObject
 end
 ```
 
+### Extending the Active Record from within the Associated Object
+
+Since `has_object` eager-loads the Associated Object class, you can also move
+any integrating code into a provided `extension` block:
+
+> [!INFO]
+> Technically, `extension` is just `Post.class_eval` but with syntactic sugar.
+
+```ruby
+class Post::Publisher < ActiveRecord::AssociatedObject
+  extension do
+    # Here we're within Post and can extend it:
+    has_many :contracts, dependent: :destroy do
+      def signed? = all?(&:signed?)
+    end
+
+    def self.with_contracts = includes(:contracts)
+
+    after_create_commit :publish_later, if: -> { contracts.signed? }
+
+    # An integrating method that operates on `publisher`.
+    private def publish_later = publisher.publish_later
+  end
+end
+```
+
+This is meant as an alternative to having a wrapping `ActiveSupport::Concern` in yet-another file like this:
+
+```ruby
+class Post < ApplicationRecord
+  include Published
+end
+
+# app/models/post/published.rb
+module Post::Published
+  extend ActiveSupport::Concern
+
+  included do
+    has_many :contracts, dependent: :destroy do
+      def signed? = all?(&:signed?)
+    end
+
+    has_object :publisher
+    after_create_commit :publish_later, if: -> { contracts.signed? }
+  end
+
+  class_methods do
+    def with_contracts = includes(:contracts)
+  end
+
+  # An integrating method that operates on `publisher`.
+  private def publish_later = publisher.publish_later
+end
+```
+
+> [!INFO]
+> Notice how in the `extension` version you don't need to:
+>
+> - have a naming convention for Concerns and where to place them.
+> - look up two files to read the feature (the concern and the associated object).
+> - wrap integrating code in an `included` block.
+> - wrap class methods in a `class_methods` block.
+
 ### Primary Benefit: Organization through Convention
 
 The primary benefit for right now is that by focusing the concept of namespaced Collaborator Objects through Associated Objects, you will start seeing them when you're modelling new features and it'll change how you structure and write your apps.
