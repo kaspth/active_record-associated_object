@@ -1,7 +1,5 @@
 module ActiveRecord::AssociatedObject::ObjectAssociation
-  def self.included(klass)
-    klass.extend ClassMethods
-  end
+  def self.included(klass) = klass.extend(ClassMethods)
 
   using Module.new {
     refine Module do
