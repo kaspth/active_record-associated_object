@@ -1,4 +1,6 @@
 module ActiveRecord::AssociatedObject::ObjectAssociation
+  def self.included(klass) = klass.extend(ClassMethods)
+
   using Module.new {
     refine Module do
       def extend_source_from(chunks, &block)
@@ -9,15 +11,22 @@ module ActiveRecord::AssociatedObject::ObjectAssociation
     end
   }
 
-  def has_object(*names, **callbacks)
-    extend_source_from(names) do |name|
-      "def #{name}; @#{name} ||= #{self.name}::#{name.to_s.classify}.new(self); end"
-    end
+  module ClassMethods
+    def has_object(*names, **callbacks)
+      extend_source_from(names) do |name|
+        "def #{name}; (@associated_objects ||= {})[:#{name}] ||= #{name.to_s.classify}.new(self); end"
+      end
 
-    extend_source_from(names) do |name|
-      callbacks.map do |callback, method|
-        "#{callback} { #{name}.#{method == true ? callback : method} }"
+      extend_source_from(names) do |name|
+        callbacks.map do |callback, method|
+          "#{callback} { #{name}.#{method == true ? callback : method} }"
+        end
       end
     end
+  end
+
+  def init_internals
+    @associated_objects = nil
+    super
   end
 end

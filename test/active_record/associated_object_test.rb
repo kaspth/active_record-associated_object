@@ -87,6 +87,15 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
     refute_empty Post.all
   end
 
+  def test_ivar_initialization
+    # Confirm that it initializes the instance variable to nil
+    assert_includes Author.new.instance_variables, :@associated_objects
+    assert_nil Author.new.instance_variable_get(:@associated_objects)
+
+    # It still includes the default Rails variables
+    assert_equal Post.new.instance_variable_get(:@new_record), true
+  end
+
   def test_kredis_integration
     Time.new(2022, 4, 20, 1).tap do |publish_at|
       @publisher.publish_at.value = publish_at
