@@ -194,6 +194,10 @@ And about a month later it was still holding up:
 
 > Just checking in to say we've added like another 4 associated objects to production since my last message. `ActiveRecord::AssociatedObject` + `ActiveJob::Performs` is like a 1-2 punch super power. I'm a bit surprised that this isn't Rails core to be honest. I want to migrate so much of our code over to this. It feels much more organized and sane. Then my app/jobs folder won't have much in it because most jobs will actually be via some associated object's _later method. app/jobs will then basically be cron-type things (deactivate any expired subscriptions).
 
+Here's what [@nshki](https://github.com/nshki) found [when they tried it](https://ruby.social/@nshki/111727840884256727):
+
+> Spent some time playing with [@kaspth](https://github.com/kaspth)'s `ActiveRecord::AssociatedObject` and `ActiveJob::Performs` and wow! The conventions these gems put in place help simplify a codebase drastically. I particularly love `ActiveJob::Performs`—it helped me refactor out all `ApplicationJob` classes I had and keep important context in the right domain model.
+
 Let's look at testing, then we'll get to passing these POROs to jobs like the quotes mentioned!
 
 ### A Quick Aside: Testing Associated Objects
