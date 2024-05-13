@@ -2,10 +2,10 @@ class ApplicationRecord::AssociatedObject < ActiveRecord::AssociatedObject; end
 
 class Author::Archiver < ApplicationRecord::AssociatedObject; end
 # TODO: Replace with Data.define once on Ruby 3.2.
-Author::Classified    = Struct.new(:author)
-Author::Fortification = Struct.new(:author)
+Author::Classified     = Struct.new(:author)
+Author::Fortifications = Struct.new(:author)
 
-Author.has_object :archiver, :classified, :fortification
+Author.has_object :archiver, :classified, :fortifications
 
 class Post::Mailroom < Struct.new(:record)
   mattr_accessor :touched, default: false

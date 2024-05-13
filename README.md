@@ -62,6 +62,9 @@ We've fixed this so you don't need to care, but this is what's happening.
 > [!TIP]
 > You can pass multiple names too: `has_object :publisher, :classified, :fortification`. I recommend `-[i]er`, `-[i]ed` and `-ion` as the general naming conventions for your Associated Objects.
 
+> [!TIP]
+> Plural Associated Object names are also supported: `Account.has_object :seats` will look up `Account::Seats`.
+
 See how we're always expecting a link to the model, here `post`?
 
 Because of that, you can rely on `post` from the associated object:
