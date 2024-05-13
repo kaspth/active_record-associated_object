@@ -7,9 +7,9 @@ class ActiveRecord::AssociatedObject::ObjectAssociationTest < ActiveSupport::Tes
     assert_kind_of Post::Mailroom, Post.first.mailroom
 
     author = Author.first
-    assert_kind_of Author::Archiver,      author.archiver
-    assert_kind_of Author::Classified,    author.classified
-    assert_kind_of Author::Fortification, author.fortification
+    assert_kind_of Author::Archiver,       author.archiver
+    assert_kind_of Author::Classified,     author.classified
+    assert_kind_of Author::Fortifications, author.fortifications
   end
 
   test "callback passing for standard PORO" do

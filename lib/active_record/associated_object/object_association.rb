@@ -14,7 +14,7 @@ module ActiveRecord::AssociatedObject::ObjectAssociation
   module ClassMethods
     def has_object(*names, **callbacks)
       extend_source_from(names) do |name|
-        "def #{name}; (@associated_objects ||= {})[:#{name}] ||= #{const_get(name.to_s.classify)}.new(self); end"
+        "def #{name}; (@associated_objects ||= {})[:#{name}] ||= #{const_get(name.to_s.camelize)}.new(self); end"
       end
 
       extend_source_from(names) do |name|
