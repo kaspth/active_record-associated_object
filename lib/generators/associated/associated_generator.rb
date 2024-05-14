@@ -11,7 +11,7 @@ class AssociatedGenerator < Rails::Generators::NamedBase
     raise "Record class '#{record_klass}' does not exist" unless File.exist?(record_file)
 
     inject_into_class record_file, record_klass do
-      indent "has_object :#{associated_object_path}\n\n"
+      optimize_indentation "has_object :#{associated_object_path}", 2
     end
   end
 

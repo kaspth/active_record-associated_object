@@ -38,7 +38,6 @@ class AssociatedGeneratorTest < Rails::Generators::TestCase
     assert_file "app/models/organization.rb", <<~RUBY
       class Organization
         has_object :seats
-
       end
     RUBY
   end
