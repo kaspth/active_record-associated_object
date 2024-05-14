@@ -43,9 +43,9 @@ class AssociatedGeneratorTest < Rails::Generators::TestCase
     RUBY
   end
 
-  test "raises error if associated parent doesn't exist" do
+  test "raises error if associated record doesn't exist" do
     assert_raise RuntimeError do
-      run_generator %w[business monkey]
+      run_generator ["Business::Monkey"]
     end
   end
 
