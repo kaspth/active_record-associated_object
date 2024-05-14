@@ -1,15 +1,6 @@
 class AssociatedGenerator < Rails::Generators::NamedBase
   source_root File.expand_path("templates", __dir__)
 
-  class MissingRecordError < StandardError
-    attr_reader :record_klass
-
-    def initialize(record_klass)
-      @record_klass = record_klass
-      super "Record class '#{record_klass}' could not be found"
-    end
-  end
-
   def generate_associated_object
     template "associated.rb", associated_object_file
   end
@@ -19,23 +10,10 @@ class AssociatedGenerator < Rails::Generators::NamedBase
   end
 
   def connect_associated_object
-    raise MissingRecordError.new(record_file) unless File.exist?(record_file)
+    raise "Record class '#{record_klass}' does not exist" unless File.exist?(record_file)
 
-    inject_into_class record_file, record_klass.to_s do
+    inject_into_class record_file, record_klass do
       indent "has_object :#{singular_name}\n\n"
-    end
-  end
-
-  def connect_associated_object_test
-    raise MissingRecordError.new(record_test_file) unless File.exist?(record_test_file)
-
-    inject_into_file record_test_file, before: /end\s\z/ do
-      indent <<~RUBY
-
-        test "works with associated object" do
-          skip "Pending"
-        end
-      RUBY
     end
   end
 

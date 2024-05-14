@@ -43,14 +43,8 @@ class AssociatedGeneratorTest < Rails::Generators::TestCase
     RUBY
   end
 
-  test "adds parent object connection test" do
-    run_generator
-
-    assert_file "test/models/organization_test.rb", /\s\stest "works with associated object" do/
-  end
-
   test "raises error if associated parent doesn't exist" do
-    assert_raise AssociatedGenerator::MissingRecordError do
+    assert_raise RuntimeError do
       run_generator %w[business monkey]
     end
   end
