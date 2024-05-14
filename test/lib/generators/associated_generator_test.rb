@@ -5,7 +5,7 @@ require "generators/associated/associated_generator"
 
 class AssociatedGeneratorTest < Rails::Generators::TestCase
   tests AssociatedGenerator
-  destination Pathname(File.expand_path("../../../tmp/generators", __dir__))
+  destination Pathname(__dir__).join("../../../tmp/generators")
 
   setup :prepare_destination, :create_record_file, :create_record_test_file
   arguments %w[Organization::Seats]
