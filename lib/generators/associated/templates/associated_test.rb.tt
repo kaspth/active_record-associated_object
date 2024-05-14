@@ -1,0 +1,10 @@
+# frozen_string_literal: true
+
+require "test_helper"
+
+class <%= record_klass %>::<%= associated_object_class %>Test < ActiveSupport::TestCase
+  setup do
+    # @<%= record_klass.downcase.underscore %> = <%= record_klass.downcase.underscore.pluralize %>(:TODO_fixture_name)
+    # @<%= associated_object_class.downcase.underscore %> = <%= record_klass %>::<%= associated_object_class %>.new(@<%= record_klass.downcase.underscore %>)
+  end
+end
