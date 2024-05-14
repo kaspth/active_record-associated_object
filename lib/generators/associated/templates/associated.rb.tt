@@ -1,4 +1,4 @@
-class <%= record_klass %>::<%= associated_object_class %> < ActiveRecord::AssociatedObject
+class <%= name %> < ActiveRecord::AssociatedObject
   extension do
     # Extend <%= record_klass %> here
   end
