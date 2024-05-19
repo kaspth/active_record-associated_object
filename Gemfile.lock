@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    active_record-associated_object (0.8.0)
+    active_record-associated_object (0.8.1)
       activerecord (>= 6.1)
 
 GEM
