@@ -14,7 +14,10 @@ module ActiveRecord::AssociatedObject::ObjectAssociation
   module ClassMethods
     def has_object(*names, **callbacks)
       extend_source_from(names) do |name|
-        "def #{name}; (@associated_objects ||= {})[:#{name}] ||= #{const_get(name.to_s.camelize)}.new(self); end"
+        const_get object_name = name.to_s.camelize
+        "def #{name}; (@associated_objects ||= {})[:#{name}] ||= #{object_name}.new(self); end"
+      rescue NameError
+        raise "The #{self}::#{object_name} associated object referenced from #{self} doesn't exist"
       end
 
       extend_source_from(names) do |name|

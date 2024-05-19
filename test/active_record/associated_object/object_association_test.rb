@@ -18,4 +18,9 @@ class ActiveRecord::AssociatedObject::ObjectAssociationTest < ActiveSupport::Tes
     Post.first.touch
     assert Post.first.mailroom.touched
   end
+
+  test "descriptive error when encountering unknown associated object" do
+    assert_raise { Post.has_object :unknown } => error
+    assert_equal "The Post::Unknown associated object referenced from Post doesn't exist", error.message
+  end
 end
