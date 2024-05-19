@@ -85,6 +85,12 @@ class Post::Publisher < ActiveRecord::AssociatedObject
 end
 ```
 
+### Use the generator to help write Associated Objects
+
+To set up the `Post::Publisher` from above, you can call `bin/rails generate associated Post::Publisher`.
+
+See `bin/rails generate associated --help` for more info.
+
 ### Forwarding callbacks onto the associated object
 
 To further help illustrate how your collaborator Associated Objects interact with your domain model, you can forward callbacks.
