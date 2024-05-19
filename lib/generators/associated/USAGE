@@ -1,0 +1,15 @@
+Description:
+    Create a PORO collaborator associated object inheriting from `ActiveRecord::AssociatedObject` that's associated with an Active Record record class.
+
+    It'll be associated on the record with `has_object`.
+
+    Note: associated object names support pluralized class names. So "Seats" remain "seats" in all cases, and "Seat" remains "seat" in all cases.
+Example:
+    bin/rails generate associated Organization::Seats
+
+    This will create:
+        app/models/organization/seats.rb
+        test/models/organization/seats_test.rb
+
+    And in Organization, this will insert:
+      has_object :seats

@@ -1,0 +1,8 @@
+require "test_helper"
+
+class <%= name %>Test < ActiveSupport::TestCase
+  setup do
+    # @<%= record_path %> = <%= record_path.pluralize %>(:TODO_fixture_name)
+    # @<%= associated_object_path %> = @<%= record_path %>.<%= associated_object_path %>
+  end
+end
