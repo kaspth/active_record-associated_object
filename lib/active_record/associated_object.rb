@@ -1,4 +1,13 @@
 class ActiveRecord::AssociatedObject
+  class Polymorphic < self
+    def self.inherited(klass)
+      if name = klass.module_parent_name
+        super
+        class_eval "def #{name.demodulize.underscore}? = record.is_a?(#{klass.record_klass})"
+      end
+    end
+  end
+
   class << self
     def inherited(klass)
       record_klass   = klass.module_parent
