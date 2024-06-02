@@ -1,4 +1,10 @@
 class ActiveRecord::AssociatedObject
+  class Polymorphic < self
+    def self.inherited(klass)
+      super if klass.module_parent_name
+    end
+  end
+
   class << self
     def inherited(klass)
       record_klass   = klass.module_parent
