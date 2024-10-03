@@ -85,6 +85,17 @@ class Post::Publisher < ActiveRecord::AssociatedObject
 end
 ```
 
+### See Associated Objects in action
+
+The team at [Flipper](https://www.flippercloud.io) used Associated Objects to help keep their new billing structure clean.
+
+You can see real life examples in these blog posts:
+
+- [Organizing Rails Code with ActiveRecord Associated Objects](https://garrettdimon.com/journal/posts/organizing-rails-code-with-activerecord-associated-objects)
+- [Data Modeling Entitlements and Pricing for SaaS Applications](https://garrettdimon.com/journal/posts/data-modeling-saas-entitlements-and-pricing)
+
+If your team is using Associated Objects, we're more than happy to feature any write ups here.
+
 ### Use the generator to help write Associated Objects
 
 To set up the `Post::Publisher` from above, you can call `bin/rails generate associated Post::Publisher`.
