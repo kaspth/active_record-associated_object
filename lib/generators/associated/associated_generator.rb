@@ -8,6 +8,7 @@ class AssociatedGenerator < Rails::Generators::NamedBase
 
   def connect_associated_object
     record_file = "#{destination_root}/app/models/#{record_path}.rb"
+
     raise "Record class '#{record_klass}' does not exist" unless File.exist?(record_file)
 
     inject_into_class record_file, record_klass do
@@ -20,8 +21,8 @@ class AssociatedGenerator < Rails::Generators::NamedBase
   # The `:name` argument can handle model names, but associated object class names aren't singularized.
   # So these record and associated_object methods prevent that.
   def record_path  = record_klass.downcase.underscore
-  def record_klass = name.deconstantize
+  def record_klass = name.camelize.deconstantize
 
-  def associated_object_path  = associated_object_class.downcase.underscore
-  def associated_object_class = name.demodulize
+  def associated_object_path  = associated_object_class.underscore
+  def associated_object_class = name.camelize.demodulize
 end

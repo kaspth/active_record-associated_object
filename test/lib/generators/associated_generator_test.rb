@@ -42,6 +42,28 @@ class AssociatedGeneratorTest < Rails::Generators::TestCase
     RUBY
   end
 
+  test "connects record: Camelized name" do
+    run_generator ["Organization::SeatsManager"]
+
+    assert_file "app/models/organization.rb", <<~RUBY
+      class Organization
+        has_object :seats_manager
+      end
+    RUBY
+  end
+
+  test "connects record: lower_snake_case name" do
+    run_generator ["organization/seats_manager"]
+
+    assert_file "app/models/organization.rb", <<~RUBY
+      class Organization
+        has_object :seats_manager
+      end
+    RUBY
+  end
+
+
+
   test "raises error if associated record doesn't exist" do
     assert_raise RuntimeError do
       run_generator ["Business::Monkey"]
