@@ -143,4 +143,16 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
     assert_predicate Post::Comment.great.first, :rated_great?
     assert_match /test\/boot\/associated_object/, Post::Comment.instance_method(:rated_great?).source_location.first
   end
+
+  class PolymorphicTest < ActiveSupport::TestCase
+    test "polymorphic associated objects" do
+      post, comment = Post.first, Post::Comment.first
+
+      assert_kind_of Post::Pricing, post.pricing
+      assert_kind_of Post::Comment::Pricing, comment.pricing
+
+      assert post.pricing.post?
+      refute comment.pricing.post?
+    end
+  end
 end

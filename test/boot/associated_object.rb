@@ -57,12 +57,14 @@ end
 Post::Comment.has_object :rating
 
 # Can locate subclasses by grepping for `< Pricing`
-class Pricing < ActiveRecord::AssociatedObject::Polymorphic
+class Pricing < ActiveRecord::AssociatedObject
   # Here, `record` will return the post for Post::Pricing objects and the comment for Post::Comment::Pricings.
+
+  def post? = record.is_a?(Post) # Probably don't do this in a real app.
 end
 
-class Post::Pricing < Pricing
-end
+class Post::Pricing < Pricing; end
+class Post::Comment::Pricing < Pricing; end
 
-class Post::Comment::Pricing < Pricing
-end
+Post.has_object :pricing
+Post::Comment.has_object :pricing
