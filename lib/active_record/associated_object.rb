@@ -1,19 +1,19 @@
 class ActiveRecord::AssociatedObject
   class << self
-    def inherited(klass)
-      record_klass   = klass.module_parent
-      record_name    = klass.module_parent_name.demodulize.underscore
-      attribute_name = klass.to_s.demodulize.underscore.to_sym
+    def associate_with_record
+      record_klass   = module_parent
+      record_name    = module_parent_name.demodulize.underscore
+      attribute_name = to_s.demodulize.underscore.to_sym
 
-      unless record_klass.respond_to?(:descends_from_active_record?) && record_klass.descends_from_active_record?
-        raise ArgumentError, "#{record_klass} isn't valid; can only associate with ActiveRecord::Base subclasses"
-      end
+      raise ArgumentError, "#{record_klass} isn't valid; can only associate with ActiveRecord::Base subclasses" \
+        unless record_klass.respond_to?(:descends_from_active_record?) && record_klass.descends_from_active_record?
 
-      klass.alias_method record_name, :record
-      klass.define_singleton_method(:record_klass)   { record_klass }
-      klass.define_singleton_method(:attribute_name) { attribute_name }
-      klass.delegate :record_klass, :attribute_name, to: :class
+      alias_method record_name, :record
+      define_singleton_method(:record_klass)   { record_klass }
+      define_singleton_method(:attribute_name) { attribute_name }
+      delegate :record_klass, :attribute_name, to: :class
     end
+    def inherited(klass) = klass.associate_with_record
 
     def extension(&block)
       record_klass.class_eval(&block)

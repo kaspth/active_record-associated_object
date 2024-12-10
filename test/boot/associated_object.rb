@@ -1,5 +1,8 @@
 class ApplicationRecord::AssociatedObject < ActiveRecord::AssociatedObject; end
 
+p ApplicationRecord::AssociatedObject.record_klass
+p ApplicationRecord::AssociatedObject.attribute_name
+
 class Author::Archiver < ApplicationRecord::AssociatedObject; end
 # TODO: Replace with Data.define once on Ruby 3.2.
 Author::Classified     = Struct.new(:author)
