@@ -96,6 +96,17 @@ You can see real life examples in these blog posts:
 
 If your team is using Associated Objects, we're more than happy to feature any write ups here.
 
+### Setting up an `ApplicationRecord::AssociatedObject`
+
+In case you need to define default logic exclusive to your Associated Objects you can set up a common base class in `app/models/application_record/associated_object.rb`.
+
+```ruby
+class ApplicationRecord::AssociatedObject < ActiveRecord::AssociatedObject
+end
+```
+
+We'll set this up when you run the generator below too.
+
 ### Use the generator to help write Associated Objects
 
 To set up the `Post::Publisher` from above, you can call `bin/rails generate associated Post::Publisher`.
