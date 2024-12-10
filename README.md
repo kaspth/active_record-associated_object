@@ -240,6 +240,68 @@ class Post::PublisherTest < ActiveSupport::TestCase
 end
 ```
 
+### Polymorphic Associated Objects
+
+If you want to share logic between associated objects, you can do so via standard Ruby modules:
+
+```ruby
+# app/models/pricing.rb
+module Pricing
+  # If you need to share an `extension` across associated objects you can override `Module::included` like this:
+  def self.included(object) = object.extension do
+    # Add common integration methods onto `Account`/`User` when the module is included.
+    # See the `extension` block in the `Extending` section above for an example.
+  end
+
+  def price_set?
+    # Instead of referring to `account` or `user`, use the `record` method to target either.
+    record.price_cents.positive?
+  end
+end
+
+# app/models/account/pricing.rb
+class Account::Pricing < ActiveRecord::AssociatedObject
+  include ::Pricing
+end
+
+# app/models/user/pricing.rb
+class User::Pricing < ActiveRecord::AssociatedObject
+  include ::Pricing
+end
+```
+
+Now we can call `account.pricing.price_set?` & `user.pricing.price_set?`.
+
+> [!NOTE]
+> Polymorphic Associated Objects are definitely a more advanced topic,
+> so you need to know your Ruby module hierarchy and how to track what `self` changes to fairly well.
+
+#### Using `ActiveSupport::Concern` as an alternative
+
+If you prefer the look of Active Support concerns, here's the equivalent to the above Ruby module:
+
+```ruby
+# app/models/pricing.rb
+module Pricing
+  extend ActiveSupport::Concern
+
+  included do
+    extension do
+      # Add common integration methods onto `Account`/`User` when the concern is included.
+    end
+  end
+
+  def price_set?
+    # Instead of referring to `account` or `user`, use the `record` method to target either.
+    record.price_cents.positive?
+  end
+end
+```
+
+Active Support concerns have some extra features that standard Ruby modules don't, like support for deeply-nested concerns and `class_methods do`.
+
+In this case, if you're reaching for those, you're probably building something too intricate and potentially brittle.
+
 ### Active Job integration via GlobalID
 
 Associated Objects include `GlobalID::Identification` and have automatic Active Job serialization support that looks like this:
