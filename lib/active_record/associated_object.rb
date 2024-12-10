@@ -1,20 +1,23 @@
 class ActiveRecord::AssociatedObject
+  singleton_class.attr_reader :record_klass, :attribute_name
+  delegate :record_klass, :attribute_name, to: :class
+
   class << self
+    def polymorphic? = record_klass.nil?
+
     def associate_with(record_klass)
       raise ArgumentError, "#{record_klass} isn't valid; can only associate with ActiveRecord::Base subclasses" \
         unless record_klass.respond_to?(:descends_from_active_record?) && record_klass.descends_from_active_record?
 
-      record_name    = module_parent_name.demodulize.underscore
-      attribute_name = to_s.demodulize.underscore.to_sym
+      @record_klass   = record_klass
+      @attribute_name = to_s.demodulize.underscore.to_sym
 
-      alias_method record_name, :record
-      define_singleton_method(:record_klass)   { record_klass }
-      define_singleton_method(:attribute_name) { attribute_name }
-      delegate :record_klass, :attribute_name, to: :class
+      alias_method module_parent_name.demodulize.underscore, :record # `alias_method :post, :record` for a `Post::Publisher`.
     end
     def inherited(klass) = klass.module_parent_name && klass.associate_with(klass.module_parent)
 
     def extension(&block)
+      raise ArgumentError, "calling `extension` on polymorphic Associated Objects isn't supported yet" if polymorphic?
       record_klass.class_eval(&block)
     end
 
