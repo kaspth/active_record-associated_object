@@ -60,7 +60,7 @@ We've fixed this so you don't need to care, but this is what's happening.
 > `has_object` only requires a namespace and an initializer that takes a single argument. The above `Post::Publisher` is perfectly valid as an Associated Object — same goes for `class Post::Publisher < Data.define(:post); end`.
 
 > [!TIP]
-> You can pass multiple names too: `has_object :publisher, :classified, :fortification`. I recommend `-[i]er`, `-[i]ed` and `-ion` as the general naming conventions for your Associated Objects.
+> You can pass multiple names too: `has_object :seats, :entitlements, :publisher, :classified, :fortification`. I recommend `-s`, `-[i]er`, `-[i]ed` and `-ion` as the general naming conventions for your Associated Objects.
 
 > [!TIP]
 > Plural Associated Object names are also supported: `Account.has_object :seats` will look up `Account::Seats`.
