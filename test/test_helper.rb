@@ -4,13 +4,15 @@ $LOAD_PATH.unshift File.expand_path("../lib", __dir__)
 
 require "rails/railtie"
 require "kredis"
-require "active_job"
-require "global_id"
 require "debug"
 require "logger"
 
 require "active_record"
 require "active_record/associated_object"
+
+require "global_id"
+require "active_job"
+require "active_job/performs"
 
 require "minitest/autorun"
 
