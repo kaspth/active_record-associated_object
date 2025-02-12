@@ -86,6 +86,22 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
     assert_equal Post.new.instance_variable_get(:@new_record), true
   end
 
+  test "cache key integration" do
+    assert_equal "post/publishers/new", Post.new.publisher.cache_key
+    assert_equal "post/publishers/1", @publisher.cache_key
+
+    assert_match %r(post/publishers/1-\d+), @publisher.cache_key_with_version
+    assert_match /\d+/, @publisher.cache_version
+    assert_equal @post.cache_version, @publisher.cache_version
+  end
+
+  test "cache key integration without cache_versioning" do
+    previous_versioning, Post.cache_versioning = Post.cache_versioning, false
+    assert_raises { @publisher.cache_key }
+  ensure
+    Post.cache_versioning = previous_versioning
+  end
+
   test "kredis integration" do
     Time.new(2022, 4, 20, 1).tap do |publish_at|
       @publisher.publish_at.value = publish_at
