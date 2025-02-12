@@ -4,6 +4,8 @@ source "https://rubygems.org"
 
 gemspec
 
+gem "securerandom", "< 0.4.0" # TODO: Unlock after Ruby 3.1 support has been removed.
+
 gem "rake", "~> 13.0"
 gem "minitest", "~> 5.0"
 gem "debug"
