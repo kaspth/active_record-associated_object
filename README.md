@@ -151,7 +151,17 @@ end
 ### Extending the Active Record from within the Associated Object
 
 Since `has_object` eager-loads the Associated Object class, you can also move
-any integrating code into a provided `extension` block:
+any integrating code into the Associated Object.
+
+If you've got a few extensions, you can use `record` to access the Active Record class:
+
+```ruby
+class Post::Publisher < ActiveRecord::AssociatedObject
+  record.has_many :contracts, dependent: :destroy # `record` returns `Post` here.
+end
+```
+
+Alternatively, if you have many extensions, use the `extension` block:
 
 > [!NOTE]
 > Technically, `extension` is just `Post.class_eval` but with syntactic sugar.

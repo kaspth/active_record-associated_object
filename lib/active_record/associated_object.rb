@@ -10,6 +10,7 @@ class ActiveRecord::AssociatedObject
       end
 
       klass.alias_method record_name, :record
+      klass.define_singleton_method(:record)         { record_klass }
       klass.define_singleton_method(:record_klass)   { record_klass }
       klass.define_singleton_method(:attribute_name) { attribute_name }
       klass.delegate :record_klass, :attribute_name, to: :class

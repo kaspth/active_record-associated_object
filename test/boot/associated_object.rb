@@ -41,9 +41,8 @@ Post.has_object :mailroom,  after_touch: true
 Post.has_object :publisher, after_update_commit: true, before_destroy: :prevent_errant_post_destroy
 
 class Post::Comment::Rating < ActiveRecord::AssociatedObject
+  record.scope :great, -> { where(body: "First!!!!") }
   extension do
-    scope :great, -> { where(body: "First!!!!") }
-
     def rated_great? = rating.great?
   end
 
