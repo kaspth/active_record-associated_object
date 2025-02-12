@@ -53,11 +53,19 @@ class ActiveRecord::AssociatedObject
     delegate :cache_version, to: :record
   end
 
-  extend ActiveModel::Naming # For `model_name`.
-  include Cached
+  module Conversion
+    def self.included(klass) = klass.class_eval do
+      include ActiveModel::Conversion
+      @_to_partial_path = "#{record.model_name.collection}/#{model_name.element}"
+    end
+  end
+
+  extend ActiveModel::Naming
+  include Cached, Conversion
 
   attr_reader :record
   delegate :id, :new_record?, :persisted?, to: :record
+  delegate :updated_at, :updated_on, to: :record # Helpful when passing to `fresh_when`/`stale?`
   delegate :transaction, to: :record
 
   def initialize(record)

@@ -86,6 +86,14 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
     assert_equal Post.new.instance_variable_get(:@new_record), true
   end
 
+  test "active model conversion integration" do
+    debugger
+    assert_equal @publisher, @publisher.to_model
+    assert_equal [@post.id], @publisher.to_key
+    assert_equal @post.id.to_s, @publisher.to_param
+    assert_equal "post/publishers/publisher", @publisher.to_partial_path
+  end
+
   test "cache key integration" do
     assert_equal "post/publishers/new", Post.new.publisher.cache_key
     assert_equal "post/publishers/1", @publisher.cache_key
