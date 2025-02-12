@@ -43,22 +43,13 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
   end
 
   test "introspection" do
-    assert_equal Post, @publisher.record_klass
-    assert_equal Post, Post::Publisher.record_klass
-
-    assert_equal :publisher, @publisher.attribute_name
+    assert_equal Post, Post::Publisher.record
     assert_equal :publisher, Post::Publisher.attribute_name
 
-    assert_equal Author, @archiver.record_klass
-    assert_equal Author, Author::Archiver.record_klass
-
-    assert_equal :archiver, @archiver.attribute_name
+    assert_equal Author, Author::Archiver.record
     assert_equal :archiver, Author::Archiver.attribute_name
 
-    assert_equal Post::Comment, @rating.record_klass
-    assert_equal Post::Comment, Post::Comment::Rating.record_klass
-
-    assert_equal :rating, @rating.attribute_name
+    assert_equal Post::Comment, Post::Comment::Rating.record
     assert_equal :rating, Post::Comment::Rating.attribute_name
   end
 
