@@ -41,15 +41,13 @@ class ActiveRecord::AssociatedObject
     end
     delegate :cache_version, to: :record
 
-    def cache_key
-      case
-      when !record.cache_versioning?
-        raise "ActiveRecord::AssociatedObject#cache_key only supports #{record.class}.cache_versioning = true"
-      when new_record?
-        "#{model_name.cache_key}/new"
-      else
-        "#{model_name.cache_key}/#{id}"
-      end
+    def cache_key = case
+    when !record.cache_versioning?
+      raise "ActiveRecord::AssociatedObject#cache_key only supports #{record.class}.cache_versioning = true"
+    when new_record?
+      "#{model_name.cache_key}/new"
+    else
+      "#{model_name.cache_key}/#{id}"
     end
   end
   include Caching
