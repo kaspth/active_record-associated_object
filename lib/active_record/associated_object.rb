@@ -1,5 +1,8 @@
+# frozen_string_literal: true
+
 class ActiveRecord::AssociatedObject
   extend ActiveModel::Naming
+  include ActiveModel::Conversion
 
   class << self
     def inherited(new_object)
@@ -32,8 +35,29 @@ class ActiveRecord::AssociatedObject
     def respond_to_missing?(...) = record.respond_to?(...) || super
   end
 
+  module Caching
+    def cache_key_with_version
+      "#{cache_key}-#{cache_version}".tap { _1.delete_suffix!("-") }
+    end
+    delegate :cache_version, to: :record
+
+    def cache_key
+      case
+      when !record.cache_versioning?
+        raise "ActiveRecord::AssociatedObject#cache_key only supports #{record_klass}.cache_versioning = true"
+      when new_record?
+        "#{model_name.cache_key}/new"
+      else
+        "#{model_name.cache_key}/#{id}"
+      end
+    end
+  end
+  include Caching
+
   attr_reader :record
-  delegate :id, :transaction, to: :record
+  delegate :id, :new_record?, :persisted?, to: :record
+  delegate :updated_at, :updated_on, to: :record # Helpful when passing to `fresh_when`/`stale?`
+  delegate :transaction, to: :record
 
   def initialize(record)
     @record = record

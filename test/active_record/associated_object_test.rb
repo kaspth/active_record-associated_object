@@ -86,6 +86,42 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
     assert_equal Post.new.instance_variable_get(:@new_record), true
   end
 
+  test "active model conversion integration" do
+    assert_equal @publisher, @publisher.to_model
+    assert_equal [@post.id], @publisher.to_key
+    assert_equal @post.id.to_s, @publisher.to_param
+    assert_equal "post/publishers/publisher", @publisher.to_partial_path
+
+    assert_equal @rating, @rating.to_model
+    assert_equal @comment.id, @rating.to_key
+    assert_equal @comment.id.join("-"), @rating.to_param
+    assert_equal "post/comment/ratings/rating", @rating.to_partial_path
+  end
+
+  test "cache_key integration" do
+    assert_equal "post/publishers/new", Post.new.publisher.cache_key
+    assert_equal "post/publishers/#{@post.id}", @publisher.cache_key
+
+    assert_match /\d+/, @publisher.cache_version
+    assert_equal @post.cache_version, @publisher.cache_version
+    assert_match %r(post/publishers/#{@post.id}-\d+), @publisher.cache_key_with_version
+
+
+    assert_equal "post/comment/ratings/new", Post::Comment.new.rating.cache_key
+    assert_equal "post/comment/ratings/#{@comment.id}", @rating.cache_key
+
+    assert_match /\d+/, @rating.cache_version
+    assert_equal @comment.cache_version, @rating.cache_version
+    assert_match %r(post/comment/ratings/.*?-\d+), @rating.cache_key_with_version
+  end
+
+  test "cache_key integration without cache_versioning" do
+    previous_versioning, Post.cache_versioning = Post.cache_versioning, false
+    assert_raises { @publisher.cache_key }
+  ensure
+    Post.cache_versioning = previous_versioning
+  end
+
   test "kredis integration" do
     Time.new(2022, 4, 20, 1).tap do |publish_at|
       @publisher.publish_at.value = publish_at
