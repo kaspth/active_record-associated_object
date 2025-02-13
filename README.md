@@ -241,7 +241,7 @@ Here's what [@nshki](https://github.com/nshki) found when they tried it:
 
 Let's look at testing, then we'll get to passing these POROs to jobs like the quotes mentioned!
 
-### A Quick Aside: Testing Associated Objects
+### Testing Associated Objects
 
 Follow the `app/models/post.rb` and `app/models/post/publisher.rb` naming structure in your tests and add `test/models/post/publisher_test.rb`.
 
@@ -260,6 +260,87 @@ class Post::PublisherTest < ActiveSupport::TestCase
   end
 end
 ```
+
+### Active Model integration
+
+Associated Objects quack like `ActiveModel`s because we:
+
+- [`extend ActiveModel::Naming`](https://api.rubyonrails.org/classes/ActiveModel/Naming.html)
+- [`include ActiveModel::Conversion`](https://api.rubyonrails.org/classes/ActiveModel/Conversion.html)
+
+This means you can pass them to helpers like `form_with` and route helpers like `url_for` too.
+
+> [!NOTE]
+> We don't `include ActiveModel::Model` since we don't need `assign_attributes` and validations really.
+
+```ruby
+# app/controllers/post/publishers_controller.rb
+class Post::PublishersController < ApplicationController
+  before_action :set_publisher
+
+  def new
+  end
+
+  def create
+    @publisher.publish params.expect(publisher: :toast)
+    redirect_back_or_to root_url, notice: "Out it goes!"
+  end
+
+  private
+    def set_publisher
+      # Associated Objects are POROs, so behind the scenes we're really doing `Post.find(…).publisher`.
+      @publisher = Post::Publisher.find(params[:id])
+    end
+end
+```
+
+And then on the view side, you can pass it into `form_with`:
+
+```erb
+<%# app/views/post/publishers/new.html.erb %>
+<%# Here `form_with` calls `url_for(@publisher)` which calls `post_publisher_path(@publisher)`. %>
+<%= form_with model: @publisher do |form| %>
+  <%= form.text_field :toast %>
+  <%= form.submit "Publish with toast" %>
+<% end %>
+```
+
+Finally, the routing is pretty standard fare:
+
+```ruby
+namespace :post do
+  resources :publishers
+end
+```
+
+#### Rendering Associated Objects
+
+Associated Objects respond to `to_partial_path`, so you can pass them directly to `render`.
+
+We're using Rails' conventions here, so view paths look like this:
+
+```erb
+<%# With a Post::Publisher, this renders app/views/post/publishers/_publisher.html.erb %>
+<%= render publisher %>
+
+<%# With a Post::Comment::Rating, this renders app/views/post/comment/ratings/_rating.html.erb %>
+<%= render rating %>
+```
+
+We've also got full support for fragment caching, so this is possible:
+
+```erb
+<%# app/views/post/publishers/_publisher.html.erb %>
+<%= cache publisher do %>
+  <%# More publishing specific view logic. %>
+<% end %>
+```
+
+> [!NOTE]
+> We only support recyclable cache keys which has been the default since Rails 5.2.
+> This means the Active Record you associate with must have `SomeModel.cache_versioning = true` enabled.
+>
+> Associated Objects respond to `cache_key`, `cache_version` and `cache_key_with_version` like Active Records.
 
 ### Polymorphic Associated Objects
 

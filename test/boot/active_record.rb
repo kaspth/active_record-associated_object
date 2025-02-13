@@ -3,6 +3,7 @@ ActiveRecord::Base.logger = Logger.new(STDOUT) if ENV["VERBOSE"] || ENV["CI"]
 
 ActiveRecord::Schema.define do
   create_table :authors, force: true do |t|
+    t.timestamps
   end
 
   create_table :posts, force: true do |t|
@@ -15,6 +16,7 @@ ActiveRecord::Schema.define do
     t.integer :post_id, null: false
     t.integer :author_id, null: false
     t.string :body
+    t.timestamps
   end
 end
 

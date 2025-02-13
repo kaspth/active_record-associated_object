@@ -2,7 +2,7 @@
 
 $LOAD_PATH.unshift File.expand_path("../lib", __dir__)
 
-require "rails/railtie"
+require "rails"
 require "kredis"
 require "debug"
 require "logger"
@@ -17,8 +17,11 @@ require "active_job/performs"
 require "minitest/autorun"
 
 # Simulate Rails app boot and run the railtie initializers manually.
+class ActiveRecord::AssociatedObject::Application < Rails::Application
+end
+
 ActiveRecord::AssociatedObject::Railtie.run_initializers
-ActiveSupport.run_load_hooks :after_initialize, Rails::Railtie
+ActiveSupport.run_load_hooks :after_initialize, Rails.application
 
 Kredis.configurator = Class.new do
   def config_for(name) = { db: "1" }

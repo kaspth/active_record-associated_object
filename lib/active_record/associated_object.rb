@@ -2,6 +2,7 @@
 
 class ActiveRecord::AssociatedObject
   extend ActiveModel::Naming
+  include ActiveModel::Conversion
 
   class << self
     def inherited(new_object)
@@ -34,10 +35,11 @@ class ActiveRecord::AssociatedObject
     def respond_to_missing?(...) = record.respond_to?(...) || super
   end
 
-  module Cached
+  module Caching
     def cache_key_with_version
       "#{cache_key}-#{cache_version}".tap { _1.delete_suffix!("-") }
     end
+    delegate :cache_version, to: :record
 
     def cache_key
       case
@@ -49,19 +51,8 @@ class ActiveRecord::AssociatedObject
         "#{model_name.cache_key}/#{id}"
       end
     end
-
-    delegate :cache_version, to: :record
   end
-
-  module Conversion
-    def self.included(klass) = klass.class_eval do
-      include ActiveModel::Conversion
-      @_to_partial_path = "#{record.model_name.collection}/#{model_name.element}"
-    end
-  end
-
-  extend ActiveModel::Naming
-  include Cached, Conversion
+  include Caching
 
   attr_reader :record
   delegate :id, :new_record?, :persisted?, to: :record
