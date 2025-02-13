@@ -117,7 +117,8 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
 
   test "cache_key integration without cache_versioning" do
     previous_versioning, Post.cache_versioning = Post.cache_versioning, false
-    assert_raises { @publisher.cache_key }
+    error = assert_raises { @publisher.cache_key }
+    assert_match /cache_key.*?Post.cache_versioning = true/, error.message
   ensure
     Post.cache_versioning = previous_versioning
   end

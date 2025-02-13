@@ -44,7 +44,7 @@ class ActiveRecord::AssociatedObject
     def cache_key
       case
       when !record.cache_versioning?
-        raise "ActiveRecord::AssociatedObject#cache_key only supports #{record_klass}.cache_versioning = true"
+        raise "ActiveRecord::AssociatedObject#cache_key only supports #{record.class}.cache_versioning = true"
       when new_record?
         "#{model_name.cache_key}/new"
       else
