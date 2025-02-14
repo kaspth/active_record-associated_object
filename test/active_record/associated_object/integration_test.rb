@@ -1,25 +1,43 @@
 require "test_helper"
+require "action_controller"
 require "action_view"
 
-class ActiveRecord::AssociatedObject::IntegrationTest < ActionView::TestCase
-  Rails.application.routes.draw do
-    namespace :post do
-      resources :publishers
-    end
+class Post::PublishersController < ActionController::Base
+  def show
+    fresh_when Post::Publisher.find(params[:id])
+    head :no_content unless performed?
   end
+end
 
-  include Rails.application.routes.url_helpers
+Rails.logger = Logger.new "/dev/null"
+Rails.application.middleware.delete ActionDispatch::HostAuthorization
 
-  ActionController::Base.cache_store = :memory_store
+Rails.application.routes.draw do
+  namespace(:post) { resources :publishers }
+end
 
-  setup do
-    @post = Post.first
-    @publisher = @post.publisher
-  end
+class ActiveRecord::AssociatedObject::IntegrationTest < ActionDispatch::IntegrationTest
+  self.app = Rails.application
+  setup { @post, @publisher = Post.first.then { [_1, _1.publisher] } }
 
   test "url helper" do
     assert_equal "/post/publishers/#{@post.id}", post_publisher_path(@publisher)
   end
+
+  test "fresh_when" do
+    get "/post/publishers/#{@post.id}"
+    assert_response :no_content
+
+    get "/post/publishers/#{@post.id}", headers: { HTTP_IF_NONE_MATCH: headers["etag"] }
+    assert_response :not_modified
+  end
+end
+
+class ActiveRecord::AssociatedObject::ViewTest < ActionView::TestCase
+  ActionController::Base.cache_store = :memory_store
+  include Rails.application.routes.url_helpers
+
+  setup { @post, @publisher = Post.first.then { [_1, _1.publisher] } }
 
   test "form_with" do
     concat form_with(model: @publisher)
