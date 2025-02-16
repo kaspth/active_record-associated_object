@@ -106,6 +106,10 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
     assert_equal @post.cache_version, @publisher.cache_version
     assert_match %r(post/publishers/#{@post.id}-\d+), @publisher.cache_key_with_version
 
+    @post.with updated_at: nil do
+      assert_equal "post/publishers/#{@post.id}", @publisher.cache_key_with_version
+    end
+
 
     assert_equal "post/comment/ratings/new", Post::Comment.new.rating.cache_key
     assert_equal "post/comment/ratings/#{@comment.id}", @rating.cache_key
@@ -113,6 +117,10 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
     assert_match /\d+/, @rating.cache_version
     assert_equal @comment.cache_version, @rating.cache_version
     assert_match %r(post/comment/ratings/.*?-\d+), @rating.cache_key_with_version
+
+    @comment.with updated_at: nil do
+      assert_equal "post/comment/ratings/#{@comment.id}", @rating.cache_key_with_version
+    end
   end
 
   test "cache_key integration without cache_versioning" do
