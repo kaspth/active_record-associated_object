@@ -87,14 +87,14 @@ end
 
 ### See Associated Objects in action
 
-#### RubyVideo.dev
+#### RubyEvents.org
 
-The team at https://www.rubyvideo.dev has been using Associated Objects to clarify the boundaries of their Active Records and collaborator Associated Objects.
+The https://www.rubyevents.org team has been using Associated Objects to clarify the boundaries of their Active Records and collaborator Associated Objects.
 
 See the usage in the source here:
 
-- [`ActiveRecord::AssociatedObject` instances](https://github.com/search?q=repo%3Aadrienpoly%2Frubyvideo%20ActiveRecord%3A%3AAssociatedObject&type=code)
-- [`has_object` calls](https://github.com/search?q=repo%3Aadrienpoly%2Frubyvideo+has_object&type=code)
+- [`ActiveRecord::AssociatedObject` instances](https://github.com/search?q=repo%3Arubyevents%2Frubyevents%20ActiveRecord%3A%3AAssociatedObject&type=code)
+- [`has_object` calls](https://github.com/search?q=repo%3Arubyevents%2Frubyevents+has_object&type=code)
 
 #### Flipper
 
