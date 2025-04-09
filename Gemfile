@@ -14,6 +14,6 @@ gem "sqlite3"
 gem "kredis"
 gem "activejob"
 gem "active_job-performs"
-gem "railties"
+gem "railties", "~> 7.1.0" # TODO: Remove lock after dropping 3.1 support.
 
 gem "minitest-sprint"
