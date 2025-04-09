@@ -4,8 +4,8 @@ source "https://rubygems.org"
 
 gemspec
 
-gem "rake", "~> 13.0"
-gem "minitest", "~> 5.0"
+gem "rake"
+gem "minitest"
 gem "debug"
 
 gem "sqlite3"
@@ -16,4 +16,4 @@ gem "activejob"
 gem "active_job-performs"
 gem "railties"
 
-gem "minitest-sprint", "~> 1.2"
+gem "minitest-sprint"
