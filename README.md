@@ -65,6 +65,18 @@ We've fixed this so you don't need to care, but this is what's happening.
 > [!TIP]
 > Plural Associated Object names are also supported: `Account.has_object :seats` will look up `Account::Seats`.
 
+> [!TIP]
+> For certain names you may want to define an acronym like so:
+>
+> ```ruby
+> # config/initializers/inflections.rb
+> ActiveSupport::Inflector.inflections(:en) do |inflect|
+>  inflect.acronym "OAuth" # ‘oauth’ → ‘OAuth’
+> end
+> ```
+>
+> Then `has_object :oauth_scopes` will look up `OAuthScopes`, instead of `OauthScopes`.
+
 See how we're always expecting a link to the model, here `post`?
 
 Because of that, you can rely on `post` from the associated object:
