@@ -71,7 +71,7 @@ We've fixed this so you don't need to care, but this is what's happening.
 > ```ruby
 > # config/initializers/inflections.rb
 > ActiveSupport::Inflector.inflections(:en) do |inflect|
->  inflect.acronym "OAuth" # ‘oauth’ → ‘OAuth’
+>   inflect.acronym "OAuth" # ‘oauth’ → ‘OAuth’
 > end
 > ```
 >
