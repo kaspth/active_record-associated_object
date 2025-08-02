@@ -42,6 +42,10 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
     assert_equal [ @rating ], Post::Comment::Rating.where(Post::Comment::Rating.primary_key => [[@post.id, @author.id]])
   end
 
+  test "associated object method missing extraction omittances" do
+    refute_respond_to Post::Publisher, :abstract_class?
+  end
+
   test "introspection" do
     assert_equal Post, Post::Publisher.record
     assert_equal :publisher, Post::Publisher.attribute_name

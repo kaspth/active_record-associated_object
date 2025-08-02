@@ -32,7 +32,10 @@ class ActiveRecord::AssociatedObject
         end
       end
     end
-    def respond_to_missing?(...) = record.respond_to?(...) || super
+
+    def respond_to_missing?(name, ...)
+      (name != :abstract_class? && record.respond_to?(name, ...)) || super
+    end
   end
 
   module Caching
