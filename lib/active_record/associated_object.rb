@@ -25,16 +25,16 @@ class ActiveRecord::AssociatedObject
       record.class_eval(&block)
     end
 
-    def method_missing(method, ...)
-      if !record.respond_to?(method) then super else
-        record.public_send(method, ...).then do |value|
+    def method_missing(meth, ...)
+      if !record.respond_to?(meth) || meth.end_with?("?", "=") then super else
+        record.public_send(meth, ...).then do |value|
           value.respond_to?(:each) ? value.map(&attribute_name) : value&.public_send(attribute_name)
         end
       end
     end
 
-    def respond_to_missing?(name, ...)
-      (name != :abstract_class? && record.respond_to?(name, ...)) || super
+    def respond_to_missing?(meth, ...)
+      (record.respond_to?(meth, ...) && !meth.end_with?("?", "=")) || super
     end
   end
 
