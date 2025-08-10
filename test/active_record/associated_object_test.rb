@@ -25,27 +25,34 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
   end
 
   test "associated object method missing extraction" do
-    assert_equal @publisher,     Post::Publisher.first
-    assert_equal @publisher,     Post::Publisher.last
-    assert_equal @publisher,     Post::Publisher.find(1)
-    assert_equal @publisher,     Post::Publisher.find_by(id: 1)
-    assert_equal @publisher,     Post::Publisher.find_by(title: Post.first.title)
-    assert_equal @publisher,     Post::Publisher.find_by(author: Author.first)
-    assert_equal @publisher,     Post::Publisher.find_by!(id: 1)
-    assert_equal @publisher,     Post::Publisher.find_by!(title: Post.first.title)
-    assert_equal @publisher,     Post::Publisher.find_by!(author: Author.first)
-    assert_equal [ @publisher ], Post::Publisher.where(id: 1)
+    [1, @post.title, @author].tap do |id, title, author|
+      assert_equal @publisher,   Post::Publisher.first
+      assert_equal @publisher,   Post::Publisher.last
+      assert_equal @publisher,   Post::Publisher.find(id)
+      assert_equal @publisher,   Post::Publisher.find_by(id:)
+      assert_equal @publisher,   Post::Publisher.find_by(title:)
+      assert_equal @publisher,   Post::Publisher.find_by(author:)
+      assert_equal @publisher,   Post::Publisher.find_by!(id:)
+      assert_equal @publisher,   Post::Publisher.find_by!(title:)
+      assert_equal @publisher,   Post::Publisher.find_by!(author:)
+      assert_equal [@publisher], Post::Publisher.where(id:)
+    end
 
-    assert_equal @rating,     Post::Comment::Rating.first
-    assert_equal @rating,     Post::Comment::Rating.last
-    assert_equal @rating,     Post::Comment::Rating.find([@post, @author])
-    assert_equal @rating,     Post::Comment::Rating.find_by(Post::Comment::Rating.primary_key => [[@post.id, @author.id]])
-    assert_equal @rating,     Post::Comment::Rating.find_by(body: "First!!!!")
-    assert_equal @rating,     Post::Comment::Rating.find_by(author: Author.first)
-    assert_equal @rating,     Post::Comment::Rating.find_by!(Post::Comment::Rating.primary_key => [[@post.id, @author.id]])
-    assert_equal @rating,     Post::Comment::Rating.find_by!(body: "First!!!!")
-    assert_equal @rating,     Post::Comment::Rating.find_by!(author: Author.first)
-    assert_equal [ @rating ], Post::Comment::Rating.where(Post::Comment::Rating.primary_key => [[@post.id, @author.id]])
+    [[@post, @author], @comment.body, @author].tap do |id, body, author|
+      assert_equal @rating, Post::Comment::Rating.first
+      assert_equal @rating, Post::Comment::Rating.last
+      assert_equal @rating, Post::Comment::Rating.find(id)
+      assert_equal @rating, Post::Comment::Rating.find_by(body:)
+      assert_equal @rating, Post::Comment::Rating.find_by(author:)
+      assert_equal @rating, Post::Comment::Rating.find_by!(body:)
+      assert_equal @rating, Post::Comment::Rating.find_by!(author:)
+    end
+
+    { Post::Comment::Rating.primary_key => [[@post.id, @author.id]] }.tap do
+      assert_equal @rating,   Post::Comment::Rating.find_by(_1)
+      assert_equal @rating,   Post::Comment::Rating.find_by!(_1)
+      assert_equal [@rating], Post::Comment::Rating.where(_1)
+    end
   end
 
   test "associated object method missing extraction omittances" do
