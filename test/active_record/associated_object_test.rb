@@ -31,6 +31,9 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
     assert_equal @publisher,     Post::Publisher.find_by(id: 1)
     assert_equal @publisher,     Post::Publisher.find_by(title: Post.first.title)
     assert_equal @publisher,     Post::Publisher.find_by(author: Author.first)
+    assert_equal @publisher,     Post::Publisher.find_by!(id: 1)
+    assert_equal @publisher,     Post::Publisher.find_by!(title: Post.first.title)
+    assert_equal @publisher,     Post::Publisher.find_by!(author: Author.first)
     assert_equal [ @publisher ], Post::Publisher.where(id: 1)
 
     assert_equal @rating,     Post::Comment::Rating.first
@@ -39,11 +42,24 @@ class ActiveRecord::AssociatedObjectTest < ActiveSupport::TestCase
     assert_equal @rating,     Post::Comment::Rating.find_by(Post::Comment::Rating.primary_key => [[@post.id, @author.id]])
     assert_equal @rating,     Post::Comment::Rating.find_by(body: "First!!!!")
     assert_equal @rating,     Post::Comment::Rating.find_by(author: Author.first)
+    assert_equal @rating,     Post::Comment::Rating.find_by!(Post::Comment::Rating.primary_key => [[@post.id, @author.id]])
+    assert_equal @rating,     Post::Comment::Rating.find_by!(body: "First!!!!")
+    assert_equal @rating,     Post::Comment::Rating.find_by!(author: Author.first)
     assert_equal [ @rating ], Post::Comment::Rating.where(Post::Comment::Rating.primary_key => [[@post.id, @author.id]])
   end
 
   test "associated object method missing extraction omittances" do
     refute_respond_to Post::Publisher, :abstract_class?
+    refute_respond_to Post::Publisher, :descends_from_active_record?
+
+    refute_respond_to Post::Publisher, :abstract_class=
+    refute_respond_to Post::Publisher, :primary_abstract_class=
+
+    assert_raise(NoMethodError) { Post::Publisher.abstract_class? }
+    assert_raise(NoMethodError) { Post::Publisher.descends_from_active_record? }
+
+    assert_raise(NoMethodError) { Post::Publisher.abstract_class = true }
+    assert_raise(NoMethodError) { Post::Publisher.primary_abstract_class = true }
   end
 
   test "introspection" do
