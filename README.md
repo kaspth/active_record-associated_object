@@ -1,5 +1,7 @@
 # ActiveRecord::AssociatedObject
 
+[![Ruby Users Forum](https://img.shields.io/discourse/topics?server=https%3A%2F%2Fwww.rubyforum.org&style=flat&logo=discourse&label=Ruby%20Users%20Forum)](https://www.rubyforum.org/tag/active-record-associated-object/60)
+
 Rails applications can end up with models that get way too big, and so far, the
 Ruby community response has been Service Objects. But sometimes `app/services`
 can turn into another junk drawer that doesn't help you build and make concepts for your Domain Model.
@@ -575,6 +577,10 @@ Install the gem and add to the application's Gemfile by executing:
 If bundler is not being used to manage dependencies, install the gem by executing:
 
     $ gem install active_record-associated_object
+
+## Community
+
+Join us in the `active_record-associated_object` tag on the [Ruby Users Forum](https://www.rubyforum.org/tag/active-record-associated-object/60), and the [Spinel Discord](https://discord.gg/u34TcumAk8).
 
 ## Development
 
